@@ -390,16 +390,22 @@ export default function ProgramList({
     { label: "Closed for now", value: "closed" }
   ];
 
-  // Field options matching Screenshot 1 exactly
+  // Field options matching Screenshot 1 + ML, DL, and specialized tech fields
   const fieldOptions = [
     { label: "All fields", value: "all" },
+    { label: "Machine Learning & Deep Learning (ML/DL)", value: "Machine Learning & Deep Learning" },
     { label: "AI", value: "AI" },
-    { label: "Cloud Computing", value: "Cloud Computing" },
-    { label: "Computer Engineering", value: "Computer Engineering" },
-    { label: "Computer Science", value: "Computer Science" },
-    { label: "Cybersecurity", value: "Cybersecurity" },
     { label: "Data Science", value: "Data Science" },
-    { label: "Software Engineering", value: "Software Engineering" }
+    { label: "Cybersecurity", value: "Cybersecurity" },
+    { label: "Robotics & Autonomous Systems", value: "Robotics & Autonomous Systems" },
+    { label: "Computer Vision", value: "Computer Vision" },
+    { label: "Quantum Computing", value: "Quantum Computing" },
+    { label: "Cloud Computing", value: "Cloud Computing" },
+    { label: "Bioinformatics", value: "Bioinformatics" },
+    { label: "Human-Computer Interaction", value: "Human-Computer Interaction" },
+    { label: "Software Engineering", value: "Software Engineering" },
+    { label: "Computer Engineering", value: "Computer Engineering" },
+    { label: "Computer Science", value: "Computer Science" }
   ];
 
   // Language options matching Screenshot 1 exactly
@@ -474,16 +480,44 @@ export default function ProgramList({
 
       const pCountry = p.country || "Austria";
 
+      const isMlSearch = q === "ml" || q === "machine learning";
+      const isDlSearch = q === "dl" || q === "deep learning";
+
       const matchesSearch =
         q === "" ||
         (p.title || "").toLowerCase().includes(q) ||
         (p.inst || "").toLowerCase().includes(q) ||
         (p.field || "").toLowerCase().includes(q) ||
+        (p.desc || "").toLowerCase().includes(q) ||
         pCity.toLowerCase().includes(q) ||
-        (p.tags || []).some((t) => t.toLowerCase().includes(q));
+        (p.tags || []).some((t) => t.toLowerCase().includes(q)) ||
+        (isMlSearch && (
+          (p.field || "").toLowerCase().includes("machine learning") ||
+          (p.title || "").toLowerCase().includes("machine learning") ||
+          (p.desc || "").toLowerCase().includes("machine learning") ||
+          (p.tags || []).some(t => t.toLowerCase().includes("machine learning") || t.toLowerCase().includes("deep learning") || t.toLowerCase() === "ml")
+        )) ||
+        (isDlSearch && (
+          (p.field || "").toLowerCase().includes("deep learning") ||
+          (p.title || "").toLowerCase().includes("deep learning") ||
+          (p.desc || "").toLowerCase().includes("deep learning") ||
+          (p.tags || []).some(t => t.toLowerCase().includes("deep learning") || t.toLowerCase() === "dl")
+        ));
 
       const matchesStatus = filterStatus === "all" ? true : p.status === filterStatus;
-      const matchesField = filterField === "all" ? true : p.field === filterField;
+      
+      let matchesField = true;
+      if (filterField !== "all") {
+        if (filterField === "Machine Learning & Deep Learning") {
+          matchesField =
+            p.field === "Machine Learning & Deep Learning" ||
+            (p.tags || []).some((t) => t.toLowerCase().includes("machine learning") || t.toLowerCase().includes("deep learning") || t.toLowerCase() === "ml" || t.toLowerCase() === "dl") ||
+            (p.title || "").toLowerCase().includes("machine learning") ||
+            (p.title || "").toLowerCase().includes("deep learning");
+        } else {
+          matchesField = p.field === filterField;
+        }
+      }
       const matchesLang = filterLanguage === "all" ? true : (p.lang || "").toLowerCase() === filterLanguage.toLowerCase();
       const matchesCountry = filterCountry === "all" ? true : pCountry.toLowerCase() === filterCountry.toLowerCase();
       const matchesCity = filterCity === "all" ? true : pCity.toLowerCase() === filterCity.toLowerCase();
@@ -835,7 +869,7 @@ export default function ProgramList({
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by keywords (e.g. AI, TU Wien, algorithms, cyber, Linz)..."
+                placeholder="Search by keywords (e.g. ML, DL, Deep Learning, AI, Cyber, Vision, TU Wien)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-10 py-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
