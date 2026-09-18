@@ -1,164 +1,100 @@
-# Austria Tech Masters Tracker
+# Austria & Germany Tech Masters Tracker
 
-A self-contained project tracking Austrian Master's programmes in Computer
-Science, Data Science, AI, Cybersecurity, Cloud Computing, Computer
-Engineering and Software Engineering — deadlines, fees, teaching language,
-and direct links to each institution's application portal.
+A production-grade, distributed microservices platform tracking European Tech Master's programmes (Artificial Intelligence, Machine Learning, Deep Learning, Computer Vision, Robotics, Quantum Computing, Cloud, Cybersecurity, Software Engineering, and Bioinformatics) across **Austria** and **Germany**.
+
+Features live deadline tracking, QS world and national rankings, seat intake quotas, admission prerequisites, EU vs Non-EU tuition fees, student working rights (20h/week), 12-month post-study visa pathways (Rot-Weiß-Rot Karte & Opportunity Card), an authenticated Admin Portal, an intelligent ad monetization microservice, and Apache Kafka real-time event streaming.
+
+---
+
+## 🏗️ Architecture & Project Structure
 
 ```
 austria-masters-project/
-├── frontend/            static HTML/CSS/JS page (works standalone, no build step)
-│   └── index.html
-├── backend/              tiny FastAPI service that serves the dataset as JSON
-│   ├── app.py
-│   └── requirements.txt
-├── scraper/               change-detection scraper (see "How updates work" below)
-│   ├── scrape.py
-│   ├── sources.json      list of URLs to monitor per programme
-│   └── requirements.txt
+├── microservices/
+│   ├── tech-masters-frontend/     # Next.js 15 App Router, React 19, Tailwind CSS, Lucide
+│   │   ├── src/app/               # Application routes (Main catalog & /admin portal)
+│   │   ├── src/components/        # ProgramList, Pill filters, Ad banners, Kafka stream
+│   │   └── package.json
+│   ├── tech-masters-backend/      # FastAPI Python REST API & Kafka Streamer
+│   │   ├── main.py                # CRUD endpoints, university directory, stats, ranking
+│   │   ├── kafka_stream.py        # Real-time event streaming publisher & consumer
+│   │   └── requirements.txt
+│   ├── tech-masters-ads-service/  # Node.js / Express Monetization Engine
+│   │   ├── index.js               # Ad rotation, CPC tracking, live revenue metrics
+│   │   └── package.json
+│   └── tech-masters-llm-scraper/  # Playwright + Gemini AI Admission Monitor
+│       ├── scrape.py              # Automated change-detection & structured extractor
+│       ├── sources.json           # Tracked universities & admissions portals
+│       └── requirements.txt
 ├── data/
-│   ├── programs.json      ← the single source of truth for all programme data
-│   ├── meta.json           written by the scraper: last run time, warnings
-│   ├── snapshots/          raw text snapshots of each monitored page
-│   ├── review_needed.json  machine-readable diff report from the last scrape
-│   └── REVIEW_NEEDED.md    human-readable version of the same report
-├── scripts/
-│   └── build_frontend.py  syncs data/programs.json → frontend's embedded fallback
-└── .github/workflows/
-    └── update.yml          runs the scraper weekly, opens a PR if pages changed
+│   ├── programs.json              # Source of truth: 41 tech masters programmes
+│   └── meta.json                  # Last scraped timestamp, cache status
+├── docker-compose.kafka.yml       # Apache Kafka (KRaft mode) streaming cluster
+├── run_local.sh                   # Environment orchestration script
+└── scripts/                       # Data enrichment & expansion utilities
 ```
 
 ---
 
-## 1. Quick start (just view it)
+## 🚀 Quick Start (Running Locally)
 
-The frontend works **completely standalone** — open `frontend/index.html` in
-a browser and it renders using the data embedded directly in the file. No
-server, no build step, no internet required (other than the "Apply here" /
-"Programme details" links, which are just normal outbound links).
-
-This is the same page already published as a Claude artifact; this project
-just gives you the source, plus the machinery to keep it current yourself.
-
-## 2. Running the full stack locally (live data)
-
+### 1. Start Apache Kafka (Event Streaming)
 ```bash
-# 1. Backend
-cd backend
-uv pip install -r requirements.txt
-uvicorn app:app --reload --port 8000
-# now visit http://localhost:8000/api/programs and http://localhost:8000/docs
-
-# 2. Frontend
-# open frontend/index.html in a text editor and change:
-#     const API_BASE_URL = "";
-# to:
-#     const API_BASE_URL = "http://localhost:8000";
-# then open frontend/index.html in a browser (or run any static file server,
-# e.g. `python3 -m http.server` from inside frontend/, and visit it)
+docker compose -f docker-compose.kafka.yml up -d
 ```
 
-With `API_BASE_URL` set, the page fetches `/api/programs` and `/api/meta` on
-load and shows a badge ("Live data · last scraped …"). If the backend isn't
-reachable for any reason, it silently falls back to the embedded snapshot —
-**the page never breaks**, it just tells you which data source it's using.
+### 2. Start FastAPI Backend (Port 8000)
+```bash
+cd microservices/tech-masters-backend
+pip install -r requirements.txt
+python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+- Interactive API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Programs JSON Endpoint: [http://localhost:8000/api/programs](http://localhost:8000/api/programs)
+- Universities Directory: [http://localhost:8000/api/universities](http://localhost:8000/api/universities)
 
-## 3. Deploying it for real
+### 3. Start Monetization Ads Service (Port 4000)
+```bash
+cd microservices/tech-masters-ads-service
+npm install
+node index.js
+```
+- Health Check: [http://localhost:4000/api/ads/health](http://localhost:4000/api/ads/health)
+- Active Campaigns: [http://localhost:4000/api/ads](http://localhost:4000/api/ads)
 
-- **Frontend**: any static host works (GitHub Pages, Netlify, Vercel,
-  Cloudflare Pages, S3+CloudFront, or just keep publishing it as a Claude
-  artifact). It's one HTML file.
-- **Backend**: any place that can run a small Python process — Render,
-  Railway, Fly.io, a `$5/mo` VPS, or a serverless function wrapping the same
-  FastAPI app. Set the `ADMIN_TOKEN` environment variable in production so
-  `/api/refresh` isn't world-writable.
-- Point the deployed frontend's `API_BASE_URL` at the deployed backend's URL.
-
----
-
-## 4. How "always updating" actually works
-
-Be realistic about what's automatable here: Austrian university admissions
-pages are wildly inconsistent — different languages, different structures,
-deadlines sometimes only in a linked PDF, some pages split EU vs. non-EU
-deadlines and some don't. A scraper that tries to auto-extract "the new
-deadline" with regex across 25+ different sites *will* eventually parse
-something wrong and silently corrupt the dataset. That's worse than stale
-data. So this project uses a **change-detection + human-confirmation**
-model instead of a fully autonomous one:
-
-1. **`scraper/scrape.py`** fetches every URL listed in `scraper/sources.json`
-   (one entry per tracked programme), strips it down to visible text, and
-   compares it against the last saved snapshot in `data/snapshots/`.
-2. If a page's text changed at all, the scraper pulls out just the
-   lines near "watch keywords" (deadline, Bewerbungsfrist, tuition,
-   Studiengebühr, etc.) from both the old and new version, and writes a
-   before/after diff to `data/REVIEW_NEEDED.md` and `data/review_needed.json`.
-3. It **never edits `data/programs.json` automatically.** You (or anyone
-   with write access) read the diff, open the actual page, confirm what
-   changed, and hand-edit the relevant entry in `data/programs.json`.
-4. Run `python3 scripts/build_frontend.py` afterwards to sync your edit
-   into `frontend/index.html`'s embedded fallback, then commit both files.
-
-### Keeping this running unattended
-
-`.github/workflows/update.yml` runs `scraper/scrape.py` every Monday
-(cron: `0 6 * * 1`, editable) via GitHub Actions — free on public repos,
-and free for a generous quota on private ones. If any monitored page
-changed, it **opens a Pull Request** containing the new snapshots and the
-`REVIEW_NEEDED.md` report, so review becomes "read a PR, confirm a date,
-edit one JSON file, merge" rather than "remember to check 25 websites
-yourself." If nothing changed, it exits quietly — no noise, no PR.
-
-You can also trigger a run manually any time from the repo's **Actions**
-tab ("Run workflow" button) — useful right before a deadline you know is
-coming up, without waiting for Monday.
-
-### If you want it fully live (no manual review step)
-
-If at some point you're confident enough in structured data for a specific
-institution (e.g. one that exposes deadlines via a JSON API or a very
-consistently formatted page), you can extend `scrape.py` to parse and write
-directly into `data/programs.json` for *that specific source* — the
-architecture supports mixing "trusted, auto-updated" sources with
-"flag-for-review" ones. That's a deliberate future extension, not something
-this project does by default, because guessing wrong here means someone
-misses a real deadline.
+### 4. Start Next.js Frontend (Port 3000)
+```bash
+cd microservices/tech-masters-frontend
+npm install
+npm run dev
+```
+- Public Catalog: [http://localhost:3000](http://localhost:3000)
+- Authenticated Admin Portal: [http://localhost:3000/admin](http://localhost:3000/admin)
+  - Default Admin Credentials: `admin@techmasters.eu` / `admin123`
 
 ---
 
-## 5. Adding a new programme
+## 🌟 Key Features
 
-1. Add an entry to `data/programs.json` (copy the shape of an existing one).
-2. Add a matching entry to `scraper/sources.json` so it gets monitored going
-   forward.
-3. Run `python3 scripts/build_frontend.py` to sync the frontend.
-4. Commit all three files.
+1. **Intelligent Search & Filter Bar**:
+   - Filter by Application Status (*Open Now*, *Opening Soon*, *Check Window*).
+   - Filter by Tech Domain (*AI & Data*, *Machine Learning / DL*, *Cybersecurity*, *Cloud*, *Robotics / Embedded*, *Quantum Computing*, *Software Engineering*).
+   - Filter by Country (*Austria 🇦🇹*, *Germany 🇩🇪*) and all major university cities (*Vienna, Munich, Berlin, Graz, Linz, Aachen, Karlsruhe, Innsbruck, Salzburg, Darmstadt, Heidelberg, Klagenfurt*).
+   - Filter by Tuition (*Free / Minimal Fee*, *Under €1,500/year*), Language (*English*, *German*), and QS World Ranking (*Top 100*, *Top 250*).
 
-## 6. Data model
+2. **Full Admission & Career Breakdown**:
+   - Total opened seats & quota allocation per intake semester.
+   - Exact academic prerequisites (ECTS in Math, Linear Algebra, Algorithms, Discrete Maths).
+   - Language certification requirements (IELTS 6.5 - 7.5, TOEFL iBT 90 - 100, CEFR C1).
+   - Work permission (20 hrs/week) and 12-month post-study job seeker visa (Rot-Weiß-Rot Karte / Opportunity Card).
+   - University research clusters and industry partners (AVL, Infineon, BMW, Siemens, SAP, DeepMind, Microsoft).
 
-Each entry in `data/programs.json` has (see any existing entry for the full
-shape): `title`, `inst`, `field`, `status` (`open`/`soon`/`unknown`/`closed`),
-`sortDate`, `deadlineEU`, `deadlineNonEU`, `windowLabel`, `desc`, `tags`,
-`lang`, `url` (programme info page), `applyUrl` (institution's application
-portal), `feeEU`, `feeEUNote`, `feeNonEU`, `feeNonEUNote`, `feeApp`,
-`feeFree`.
+3. **Secure Admin Portal (`/admin`)**:
+   - Program Manager: Real-time CRUD operations to add, edit, or archive programmes.
+   - Ad Campaigns: Toggle active sponsorships, adjust CPC pricing, view impressions and clicks.
+   - Kafka Monitor: Stream live admission changes, view broker connectivity and consumer status.
 
-`status` drives the grouping/sort order on the page (open → opening soon →
-check current window → closed); `sortDate` drives ordering *within* a group,
-and by convention is set to the **non-EU/third-country deadline** where the
-two differ, since that's the tighter constraint applicants face.
-
-## 7. Limitations, honestly
-
-- The scraper flags *page changed*, not *deadline changed specifically* —
-  a page could change for an unrelated reason (a typo fix, a new photo) and
-  still get flagged. That's an acceptable false-positive rate for the
-  safety it buys.
-- 25 institutional pages is a moderate but real list; keeping
-  `scraper/sources.json` current as universities restructure their sites
-  is an ongoing task, not a one-time setup.
-- Some institutions (noted directly in `data/programs.json` via
-  `feeEUNote`/`feeNonEUNote`/status `"unknown"`) don't publish clean,
-  single-source-of-truth deadlines at all — those need periodic manual
-  re-verification regardless of tooling.
+4. **Apache Kafka Streaming Architecture**:
+   - Kafka topic: `techmasters.admissions.stream`.
+   - Produces event payloads for programme creations, status toggles, and deadline adjustments.
+   - Asynchronously broadcasts real-time updates to connected consumers.

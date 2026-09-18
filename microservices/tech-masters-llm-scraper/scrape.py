@@ -18,11 +18,12 @@ from playwright.sync_api import sync_playwright
 from google import genai
 from pydantic import BaseModel, Field
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-SOURCES_FILE = BASE_DIR / "scraper" / "sources.json"
-PROGRAMS_FILE = BASE_DIR / "data" / "programs.json"
-SNAPSHOT_DIR = BASE_DIR / "data" / "snapshots"
-META_FILE = BASE_DIR / "data" / "meta.json"
+SERVICE_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SERVICE_DIR.parent.parent
+SOURCES_FILE = SERVICE_DIR / "sources.json"
+PROGRAMS_FILE = PROJECT_ROOT / "data" / "programs.json"
+SNAPSHOT_DIR = PROJECT_ROOT / "data" / "snapshots"
+META_FILE = PROJECT_ROOT / "data" / "meta.json"
 REQUEST_DELAY_SECONDS = 2
 
 # Initialize Gemini Client (requires GEMINI_API_KEY env var)
