@@ -14,10 +14,10 @@ import {
   Trophy,
   Globe,
   Building2,
-  SlidersHorizontal,
   RotateCcw,
   ArrowUpDown,
-  Check
+  Filter,
+  X
 } from "lucide-react";
 
 export type Program = {
@@ -235,6 +235,18 @@ const FALLBACK_UNIVERSITIES: University[] = [
     programs_count: 1
   },
   {
+    name: "Hochschule Burgenland",
+    short_name: "HS Burgenland",
+    city: "Eisenstadt",
+    country: "Austria",
+    rank_world: 980,
+    rank_country: 15,
+    type: "University of Applied Sciences",
+    website: "https://www.hochschule-burgenland.at",
+    description: "Cloud computing and business informatics applied programs.",
+    programs_count: 1
+  },
+  {
     name: "Technical University of Munich (TUM)",
     short_name: "TUM Munich",
     city: "Munich",
@@ -294,15 +306,16 @@ export default function ProgramList({
   // Views
   const [activeTab, setActiveTab] = useState<"programs" | "universities">("programs");
 
-  // Filters from User Screenshot 1
+  // Customized Search Filters (Exact Match to User Screenshots)
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterField, setFilterField] = useState<string>("all");
   const [filterLanguage, setFilterLanguage] = useState<string>("all");
 
-  // Geographical Filters requested by User
+  // Geographical Search Filters
   const [filterCountry, setFilterCountry] = useState<string>("all");
   const [filterCity, setFilterCity] = useState<string>("all");
-  const [filterUniversity, setFilterUniversity] = useState<string>("all");
+  const [filterRanking, setFilterRanking] = useState<string>("all");
+  const [filterTuition, setFilterTuition] = useState<string>("all");
 
   // Search & Sorting
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -312,26 +325,20 @@ export default function ProgramList({
     return (initialUniversities && initialUniversities.length > 0) ? initialUniversities : FALLBACK_UNIVERSITIES;
   }, [initialUniversities]);
 
-  // Extract unique cities & fields & languages
-  const availableCities = useMemo(() => {
-    const set = new Set<string>();
-    initialPrograms.forEach((p) => {
-      const city = p.city || (p.inst.toLowerCase().includes("vienna") ? "Vienna" :
-        p.inst.toLowerCase().includes("linz") ? "Linz" :
-        p.inst.toLowerCase().includes("graz") ? "Graz" :
-        p.inst.toLowerCase().includes("salzburg") ? "Salzburg" :
-        p.inst.toLowerCase().includes("innsbruck") ? "Innsbruck" :
-        p.inst.toLowerCase().includes("hagenberg") ? "Hagenberg" :
-        p.inst.toLowerCase().includes("klagenfurt") ? "Klagenfurt" :
-        p.inst.toLowerCase().includes("pölten") || p.inst.toLowerCase().includes("ustp") ? "St. Pölten" :
-        p.inst.toLowerCase().includes("villach") ? "Villach" :
-        p.inst.toLowerCase().includes("eisenstadt") ? "Eisenstadt" : "Vienna");
-      set.add(city);
-    });
-    return Array.from(set).sort();
-  }, [initialPrograms]);
+  // Extract cities
+  const availableCities = [
+    "Vienna",
+    "Linz",
+    "Graz",
+    "Salzburg",
+    "Innsbruck",
+    "Hagenberg",
+    "St. Pölten",
+    "Villach",
+    "Eisenstadt"
+  ];
 
-  // Status options matching Screenshot 1
+  // Status options matching Screenshot 1 exactly
   const statusOptions = [
     { label: "All", value: "all" },
     { label: "Open now", value: "open" },
@@ -339,7 +346,7 @@ export default function ProgramList({
     { label: "Closed for now", value: "closed" }
   ];
 
-  // Field options matching Screenshot 1
+  // Field options matching Screenshot 1 exactly
   const fieldOptions = [
     { label: "All fields", value: "all" },
     { label: "AI", value: "AI" },
@@ -351,7 +358,7 @@ export default function ProgramList({
     { label: "Software Engineering", value: "Software Engineering" }
   ];
 
-  // Language options matching Screenshot 1
+  // Language options matching Screenshot 1 exactly
   const languageOptions = [
     { label: "All languages", value: "all" },
     { label: "English", value: "English" },
@@ -368,6 +375,21 @@ export default function ProgramList({
     { label: "🇨🇭 Switzerland", value: "Switzerland" }
   ];
 
+  // Ranking tier filter options
+  const rankingOptions = [
+    { label: "All rankings", value: "all" },
+    { label: "🏆 QS Top 200 World", value: "top200" },
+    { label: "🌐 QS Top 500 World", value: "top500" },
+    { label: "🥇 #1-#3 in Country", value: "top3country" }
+  ];
+
+  // Tuition filter options
+  const tuitionOptions = [
+    { label: "All tuition types", value: "all" },
+    { label: "✨ Free / ÖH Fee only", value: "free" },
+    { label: "💶 Standard EU (~€363/sem)", value: "standard_eu" }
+  ];
+
   // Reset all filters
   const resetFilters = () => {
     setFilterStatus("all");
@@ -375,13 +397,21 @@ export default function ProgramList({
     setFilterLanguage("all");
     setFilterCountry("all");
     setFilterCity("all");
-    setFilterUniversity("all");
+    setFilterRanking("all");
+    setFilterTuition("all");
     setSearchTerm("");
     setSortBy("rank_world");
   };
 
-  const hasActiveFilters = filterStatus !== "all" || filterField !== "all" || filterLanguage !== "all" ||
-    filterCountry !== "all" || filterCity !== "all" || filterUniversity !== "all" || searchTerm !== "";
+  const hasActiveFilters =
+    filterStatus !== "all" ||
+    filterField !== "all" ||
+    filterLanguage !== "all" ||
+    filterCountry !== "all" ||
+    filterCity !== "all" ||
+    filterRanking !== "all" ||
+    filterTuition !== "all" ||
+    searchTerm.trim() !== "";
 
   // Filter & Sort Programs
   const filteredPrograms = useMemo(() => {
@@ -398,7 +428,10 @@ export default function ProgramList({
         p.inst.toLowerCase().includes("villach") ? "Villach" :
         p.inst.toLowerCase().includes("eisenstadt") ? "Eisenstadt" : "Vienna");
 
+      const pCountry = p.country || "Austria";
+
       const matchesSearch =
+        q === "" ||
         (p.title || "").toLowerCase().includes(q) ||
         (p.inst || "").toLowerCase().includes(q) ||
         (p.field || "").toLowerCase().includes(q) ||
@@ -408,13 +441,24 @@ export default function ProgramList({
       const matchesStatus = filterStatus === "all" ? true : p.status === filterStatus;
       const matchesField = filterField === "all" ? true : p.field === filterField;
       const matchesLang = filterLanguage === "all" ? true : (p.lang || "").toLowerCase() === filterLanguage.toLowerCase();
-      const matchesCountry = filterCountry === "all" ? true : (p.country || "Austria").toLowerCase() === filterCountry.toLowerCase();
+      const matchesCountry = filterCountry === "all" ? true : pCountry.toLowerCase() === filterCountry.toLowerCase();
       const matchesCity = filterCity === "all" ? true : pCity.toLowerCase() === filterCity.toLowerCase();
-      const matchesUni = filterUniversity === "all" ? true :
-        (p.uni_name || "").toLowerCase().includes(filterUniversity.toLowerCase()) ||
-        (p.inst || "").toLowerCase().includes(filterUniversity.toLowerCase());
 
-      return matchesSearch && matchesStatus && matchesField && matchesLang && matchesCountry && matchesCity && matchesUni;
+      // Ranking filters
+      let matchesRank = true;
+      const r = p.uni_rank_world || 999;
+      const cr = p.uni_rank_country || 99;
+      if (filterRanking === "top200") matchesRank = r <= 200;
+      else if (filterRanking === "top500") matchesRank = r <= 500;
+      else if (filterRanking === "top3country") matchesRank = cr <= 3;
+
+      // Tuition filters
+      let matchesTuition = true;
+      const feeEu = (p.feeEU || "").toLowerCase();
+      if (filterTuition === "free") matchesTuition = feeEu.includes("free") || p.feeFree === true;
+      else if (filterTuition === "standard_eu") matchesTuition = feeEu.includes("363");
+
+      return matchesSearch && matchesStatus && matchesField && matchesLang && matchesCountry && matchesCity && matchesRank && matchesTuition;
     });
 
     // Sorting
@@ -440,7 +484,7 @@ export default function ProgramList({
     });
 
     return list;
-  }, [initialPrograms, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterUniversity, sortBy]);
+  }, [initialPrograms, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, sortBy]);
 
   // Universities grouped by country
   const universitiesByCountry = useMemo(() => {
@@ -451,7 +495,6 @@ export default function ProgramList({
       if (!map[u.country]) map[u.country] = [];
       map[u.country].push(u);
     });
-    // Sort universities by national rank
     Object.keys(map).forEach((c) => {
       map[c].sort((a, b) => a.rank_country - b.rank_country);
     });
@@ -460,10 +503,10 @@ export default function ProgramList({
 
   return (
     <div className="w-full max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      {/* Header Banner */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-[#21262d] pb-6">
+      {/* Top Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-[#212b28] pb-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-[#80b9a6] text-xs font-semibold uppercase tracking-wider mb-2.5">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7ec8a7]/10 border border-[#7ec8a7]/30 text-[#7ec8a7] text-xs font-semibold uppercase tracking-wider mb-2.5">
             <Sparkles className="w-3.5 h-3.5" />
             Global Tech Masters Portal
           </div>
@@ -476,12 +519,12 @@ export default function ProgramList({
         </div>
 
         {/* View Switcher Tabs */}
-        <div className="flex items-center bg-[#161b22] p-1.5 rounded-2xl border border-[#30363d] shadow-sm">
+        <div className="flex items-center bg-[#141d1a] p-1.5 rounded-2xl border border-[#273430] shadow-sm">
           <button
             onClick={() => setActiveTab("programs")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === "programs"
-                ? "bg-[#80b9a6] text-slate-950 shadow-md font-bold"
+                ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
                 : "text-slate-300 hover:text-white"
             }`}
           >
@@ -492,7 +535,7 @@ export default function ProgramList({
             onClick={() => setActiveTab("universities")}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
               activeTab === "universities"
-                ? "bg-[#80b9a6] text-slate-950 shadow-md font-bold"
+                ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
                 : "text-slate-300 hover:text-white"
             }`}
           >
@@ -502,22 +545,22 @@ export default function ProgramList({
         </div>
       </div>
 
-      {/* Screenshot 1 Exact Pill Filter Bar */}
-      <div className="bg-[#161b22]/90 backdrop-blur-xl border border-[#30363d] rounded-2xl p-5 sm:p-6 mb-6 shadow-xl space-y-4">
-        {/* Status Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <span className="w-24 text-xs sm:text-sm font-semibold text-slate-400 shrink-0">Status</span>
-          <div className="flex flex-wrap items-center gap-2">
+      {/* Screenshot 1 Exact Customized Pill Filter Box */}
+      <div className="bg-[#0e1413] border border-[#232f2b] rounded-2xl p-5 sm:p-7 mb-6 shadow-2xl space-y-6">
+        {/* Row 1: Status */}
+        <div>
+          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Status</span>
+          <div className="flex flex-wrap items-center gap-2.5">
             {statusOptions.map((opt) => {
               const active = filterStatus === opt.value;
               return (
                 <button
                   key={opt.value}
                   onClick={() => setFilterStatus(opt.value)}
-                  className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                      : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
                   }`}
                 >
                   {opt.label}
@@ -527,20 +570,20 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Field Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <span className="w-24 text-xs sm:text-sm font-semibold text-slate-400 shrink-0">Field</span>
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Row 2: Field */}
+        <div>
+          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Field</span>
+          <div className="flex flex-wrap items-center gap-2.5">
             {fieldOptions.map((opt) => {
               const active = filterField === opt.value;
               return (
                 <button
                   key={opt.value}
                   onClick={() => setFilterField(opt.value)}
-                  className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                      : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
                   }`}
                 >
                   {opt.label}
@@ -550,20 +593,20 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Language Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <span className="w-24 text-xs sm:text-sm font-semibold text-slate-400 shrink-0">Language</span>
-          <div className="flex flex-wrap items-center gap-2">
+        {/* Row 3: Language */}
+        <div>
+          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Language</span>
+          <div className="flex flex-wrap items-center gap-2.5">
             {languageOptions.map((opt) => {
               const active = filterLanguage === opt.value;
               return (
                 <button
                   key={opt.value}
                   onClick={() => setFilterLanguage(opt.value)}
-                  className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                      : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
                   }`}
                 >
                   {opt.label}
@@ -573,13 +616,13 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Geographic Row: Country */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 pt-2 border-t border-[#30363d]/60">
-          <span className="w-24 text-xs sm:text-sm font-semibold text-slate-400 shrink-0 flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-teal-400" />
+        {/* Row 4: Geographical Search - Country */}
+        <div className="pt-2 border-t border-[#1f2c27]">
+          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+            <Globe className="w-3.5 h-3.5 text-[#7ec8a7]" />
             Country
           </span>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             {countryOptions.map((opt) => {
               const active = filterCountry === opt.value;
               return (
@@ -589,10 +632,10 @@ export default function ProgramList({
                     setFilterCountry(opt.value);
                     setFilterCity("all");
                   }}
-                  className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                      : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
                   }`}
                 >
                   {opt.label}
@@ -602,19 +645,19 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Geographic Row: City */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-          <span className="w-24 text-xs sm:text-sm font-semibold text-slate-400 shrink-0 flex items-center gap-1.5">
+        {/* Row 5: Geographical Search - City */}
+        <div>
+          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
             <MapPin className="w-3.5 h-3.5 text-blue-400" />
             City
           </span>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={() => setFilterCity("all")}
-              className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                 filterCity === "all"
-                  ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                  : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                  ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                  : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
               }`}
             >
               All cities
@@ -625,10 +668,10 @@ export default function ProgramList({
                 <button
                   key={city}
                   onClick={() => setFilterCity(city)}
-                  className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     active
-                      ? "bg-[#80b9a6] text-slate-950 font-bold shadow-sm"
-                      : "bg-[#21262d] hover:bg-[#30363d] text-slate-300 border border-[#30363d]"
+                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
                   }`}
                 >
                   {city}
@@ -638,43 +681,104 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Search & Sort Row */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-3 border-t border-[#30363d]/60">
-          {/* Keyword Search */}
-          <div className="relative flex-1 max-w-md">
+        {/* Row 6: University Rankings & Tuition */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2 border-t border-[#1f2c27]">
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              University Ranking Tier
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              {rankingOptions.map((opt) => {
+                const active = filterRanking === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterRanking(opt.value)}
+                    className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+              <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+              Tuition Cost
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              {tuitionOptions.map((opt) => {
+                const active = filterTuition === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterTuition(opt.value)}
+                    className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Row 7: Keyword Search & Sort Controls */}
+        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-3 border-t border-[#1f2c27]">
+          {/* Keyword Search Input */}
+          <div className="relative flex-1 max-w-lg">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search program, university, specialization..."
+              placeholder="Search by keywords (e.g. AI, TU Wien, algorithms, cyber, Linz)..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-[#0d1117] border border-[#30363d] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#80b9a6]"
+              className="w-full pl-10 pr-10 py-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
             />
+            {searchTerm && (
+              <button
+                onClick={() => setSearchTerm("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
-          {/* Sort By Selector */}
-          <div className="flex items-center gap-2 self-start md:self-auto">
+          {/* Sort Selector & Reset */}
+          <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
             <ArrowUpDown className="w-4 h-4 text-slate-400 shrink-0" />
             <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#0d1117] border border-[#30363d] text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#80b9a6] cursor-pointer"
+              className="bg-[#141d1a] border border-[#273430] text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
             >
               <option value="rank_world">🌐 QS World Rank (Best first)</option>
-              <option value="rank_country">🏆 Country Rank (#1 first)</option>
-              <option value="deadline">⏰ Deadline (Closing soon)</option>
-              <option value="tuition">💰 Tuition (Free / Low first)</option>
+              <option value="rank_country">🏆 Country Rank (#1 in Austria)</option>
+              <option value="deadline">⏰ Deadline (Closing soonest)</option>
+              <option value="tuition">💰 Tuition (Free / Lowest first)</option>
               <option value="name">🔤 Program Name (A - Z)</option>
             </select>
 
             {hasActiveFilters && (
               <button
                 onClick={resetFilters}
-                className="flex items-center gap-1 text-xs text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/30 px-3 py-2 rounded-xl transition-all ml-2 font-medium"
+                className="flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 border border-rose-500/30 px-3 py-2 rounded-xl transition-all font-semibold"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                Reset
+                Reset Filters
               </button>
             )}
           </div>
@@ -691,8 +795,8 @@ export default function ProgramList({
             <strong className="text-slate-200 font-bold">{initialPrograms.length}</strong> programmes tracked
           </span>
           {hasActiveFilters && (
-            <span className="text-[#80b9a6] font-semibold">
-              ({filteredPrograms.length} matching active filters)
+            <span className="text-[#7ec8a7] font-semibold">
+              ({filteredPrograms.length} matching your customized search)
             </span>
           )}
         </div>
@@ -759,7 +863,7 @@ export default function ProgramList({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.25, delay: Math.min(idx * 0.02, 0.25) }}
-                  className="group bg-[#161b22]/95 backdrop-blur-md border border-[#30363d] hover:border-[#80b9a6]/60 hover:shadow-2xl hover:shadow-[#80b9a6]/5 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
+                  className="group bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 hover:shadow-2xl hover:shadow-[#7ec8a7]/5 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
                 >
                   {/* Card Content */}
                   <div className="p-5 sm:p-6 flex-1 flex flex-col">
@@ -783,20 +887,20 @@ export default function ProgramList({
                       </span>
 
                       {/* Field Tag */}
-                      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-[#80b9a6] border border-teal-500/20">
+                      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-[#7ec8a7] border border-teal-500/20">
                         {prog.field}
                       </span>
                     </div>
 
                     {/* Program Title */}
-                    <h2 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug group-hover:text-[#80b9a6] transition-colors">
+                    <h2 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug group-hover:text-[#7ec8a7] transition-colors">
                       {prog.title}
                     </h2>
 
                     {/* Institution & Geographical Location */}
                     <div className="flex flex-wrap items-center gap-2 text-slate-400 text-xs sm:text-sm font-medium mb-3">
                       <div className="flex items-center gap-1.5 text-slate-300">
-                        <Building2 className="w-3.5 h-3.5 text-[#80b9a6] shrink-0" />
+                        <Building2 className="w-3.5 h-3.5 text-[#7ec8a7] shrink-0" />
                         <span className="truncate font-semibold">{prog.inst}</span>
                       </div>
                       <a
@@ -812,11 +916,11 @@ export default function ProgramList({
 
                     {/* City & Country Tag */}
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#21262d] text-slate-300 border border-[#30363d]">
+                      <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#18211f] text-slate-300 border border-[#2d3a36]">
                         <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
                         {city}, {country === "Germany" ? "🇩🇪 Germany" : "🇦🇹 Austria"}
                       </span>
-                      <span className="text-xs px-2 py-0.5 rounded bg-[#21262d] text-slate-400 border border-[#30363d]">
+                      <span className="text-xs px-2 py-0.5 rounded bg-[#18211f] text-slate-400 border border-[#2d3a36]">
                         {prog.lang || "English"}
                       </span>
                     </div>
@@ -827,7 +931,7 @@ export default function ProgramList({
                     </p>
 
                     {/* Deadlines & Tuition 2x2 Info Grid (ZERO OVERLAP) */}
-                    <div className="bg-[#0d1117] rounded-xl border border-[#30363d] p-3.5 space-y-3 mb-4">
+                    <div className="bg-[#080d0c] rounded-xl border border-[#232f2b] p-3.5 space-y-3 mb-4">
                       {/* Deadlines */}
                       <div>
                         <div className="flex items-center gap-1.5 mb-2">
@@ -835,13 +939,13 @@ export default function ProgramList({
                           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlines</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          <div className="bg-[#161b22] rounded-lg p-2.5 border border-[#30363d]">
+                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
                             <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Students</span>
                             <span className="text-slate-200 font-medium break-words leading-tight block">
                               {prog.deadlineEU || "See official site"}
                             </span>
                           </div>
-                          <div className="bg-[#161b22] rounded-lg p-2.5 border border-[#30363d]">
+                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
                             <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Students</span>
                             <span className="text-slate-200 font-medium break-words leading-tight block">
                               {prog.deadlineNonEU || "See official site"}
@@ -851,19 +955,19 @@ export default function ProgramList({
                       </div>
 
                       {/* Tuition Fees */}
-                      <div className="pt-2.5 border-t border-[#30363d]">
+                      <div className="pt-2.5 border-t border-[#232f2b]">
                         <div className="flex items-center gap-1.5 mb-2">
                           <Banknote className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tuition Fees</span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          <div className="bg-[#161b22] rounded-lg p-2.5 border border-[#30363d]">
+                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
                             <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Tuition</span>
                             <span className="text-slate-200 font-medium break-words leading-tight block">
                               {prog.feeEU || "Free / ÖH fee only"}
                             </span>
                           </div>
-                          <div className="bg-[#161b22] rounded-lg p-2.5 border border-[#30363d]">
+                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
                             <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Tuition</span>
                             <span className="text-slate-200 font-medium break-words leading-tight block">
                               {prog.feeNonEU || "Standard rate"}
@@ -879,7 +983,7 @@ export default function ProgramList({
                         {prog.tags.map((t) => (
                           <span
                             key={t}
-                            className="px-2 py-0.5 bg-[#21262d] border border-[#30363d] text-slate-300 text-[11px] font-medium rounded-md"
+                            className="px-2 py-0.5 bg-[#18211f] border border-[#2d3a36] text-slate-300 text-[11px] font-medium rounded-md"
                           >
                             {t}
                           </span>
@@ -889,12 +993,12 @@ export default function ProgramList({
                   </div>
 
                   {/* Actions */}
-                  <div className="p-3.5 sm:p-4 bg-[#0d1117] border-t border-[#30363d] grid grid-cols-2 gap-3 mt-auto">
+                  <div className="p-3.5 sm:p-4 bg-[#080d0c] border-t border-[#232f2b] grid grid-cols-2 gap-3 mt-auto">
                     <a
                       href={prog.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#21262d] hover:bg-[#30363d] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#30363d] active:scale-95"
+                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#18211f] hover:bg-[#273430] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#2d3a36] active:scale-95"
                     >
                       <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                       <span>Details</span>
@@ -905,8 +1009,8 @@ export default function ProgramList({
                       rel="noreferrer"
                       className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 ${
                         prog.status === "open"
-                          ? "bg-blue-600 hover:bg-blue-500 text-white border-blue-500 shadow-md shadow-blue-600/20"
-                          : "bg-[#21262d] hover:bg-[#30363d] text-slate-400 border-[#30363d] cursor-not-allowed"
+                          ? "bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] border-[#7ec8a7] shadow-md shadow-[#7ec8a7]/20 font-bold"
+                          : "bg-[#18211f] hover:bg-[#273430] text-slate-400 border-[#2d3a36] cursor-not-allowed"
                       }`}
                       onClick={(e) => {
                         if (prog.status !== "open") e.preventDefault();
@@ -928,10 +1032,10 @@ export default function ProgramList({
         <div className="space-y-10">
           {Object.entries(universitiesByCountry).map(([countryName, uList]) => (
             <div key={countryName} className="space-y-4">
-              <div className="flex items-center gap-3 border-b border-[#30363d] pb-3">
+              <div className="flex items-center gap-3 border-b border-[#232f2b] pb-3">
                 <span className="text-2xl">{countryName === "Austria" ? "🇦🇹" : countryName === "Germany" ? "🇩🇪" : "🇨🇭"}</span>
                 <h2 className="text-2xl font-bold text-white">{countryName} Universities</h2>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-teal-500/10 text-[#80b9a6] border border-teal-500/30 font-semibold ml-auto">
+                <span className="text-xs px-2.5 py-1 rounded-full bg-[#7ec8a7]/10 text-[#7ec8a7] border border-[#7ec8a7]/30 font-semibold ml-auto">
                   {uList.length} Institutions
                 </span>
               </div>
@@ -940,7 +1044,7 @@ export default function ProgramList({
                 {uList.map((uni) => (
                   <div
                     key={uni.name}
-                    className="bg-[#161b22] border border-[#30363d] hover:border-[#80b9a6]/60 rounded-2xl p-5 flex flex-col justify-between transition-all hover:shadow-xl shadow-black/40"
+                    className="bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 rounded-2xl p-5 flex flex-col justify-between transition-all hover:shadow-xl shadow-black/40"
                   >
                     <div>
                       {/* Top Rank Badge */}
@@ -971,7 +1075,7 @@ export default function ProgramList({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="pt-4 border-t border-[#30363d] flex items-center justify-between gap-3">
+                    <div className="pt-4 border-t border-[#232f2b] flex items-center justify-between gap-3">
                       <a
                         href={uni.website}
                         target="_blank"
@@ -984,10 +1088,10 @@ export default function ProgramList({
 
                       <button
                         onClick={() => {
-                          setFilterUniversity(uni.short_name);
+                          setSearchTerm(uni.short_name);
                           setActiveTab("programs");
                         }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#21262d] hover:bg-[#80b9a6] hover:text-slate-950 text-slate-200 text-xs font-semibold border border-[#30363d] transition-all"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#18211f] hover:bg-[#7ec8a7] hover:text-[#0f1a16] text-slate-200 text-xs font-semibold border border-[#2d3a36] transition-all"
                       >
                         <GraduationCap className="w-3.5 h-3.5" />
                         View Programs
@@ -1003,15 +1107,15 @@ export default function ProgramList({
 
       {/* Empty State */}
       {filteredPrograms.length === 0 && activeTab === "programs" && (
-        <div className="text-center py-20 text-slate-500 bg-[#161b22]/40 border border-[#30363d] rounded-3xl mt-6 p-8">
+        <div className="text-center py-20 text-slate-500 bg-[#0e1413]/60 border border-[#232f2b] rounded-3xl mt-6 p-8">
           <ShieldAlert className="w-12 h-12 mx-auto mb-3 text-slate-600" />
           <h3 className="text-lg font-semibold text-slate-300 mb-1">No Programs Found</h3>
           <p className="text-sm max-w-md mx-auto mb-4">
-            No degrees matched your active search filters. Try clearing some selections.
+            No degrees matched your customized search filters. Try clearing some selections.
           </p>
           <button
             onClick={resetFilters}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#80b9a6] text-slate-950 text-xs font-bold hover:bg-teal-400 transition-all shadow-md"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7ec8a7] text-[#0f1a16] text-xs font-bold hover:bg-teal-400 transition-all shadow-md"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             Reset All Filters
