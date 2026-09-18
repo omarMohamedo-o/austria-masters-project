@@ -1,0 +1,9 @@
+{
+  "last_updated": "2026-09-18T00:00:00+00:00",
+  "sources_checked": 0,
+  "sources_errored": 0,
+  "changes_detected": 0,
+  "warnings": [],
+  "entries": 26,
+  "note": "Seed file. Run scraper/scrape.py once to establish real snapshots and a real timestamp."
+}
