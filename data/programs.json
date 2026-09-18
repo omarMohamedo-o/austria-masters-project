@@ -27,7 +27,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Dynatrace (Linz HQ), Voestalpine, KEBA, RISC Software, Audi AI Research Lab.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Computer Science (MSc)",
@@ -53,7 +60,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Dynatrace (Linz HQ), Voestalpine, KEBA, RISC Software, Audi AI Research Lab.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Statistics and Data Science (MSc)",
@@ -81,7 +95,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Dynatrace (Linz HQ), Voestalpine, KEBA, RISC Software, Audi AI Research Lab.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Data Science (MSc / Dipl.-Ing.)",
@@ -109,7 +130,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Computer Engineering (Dipl.-Ing.)",
@@ -135,7 +163,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Data Science (MSc)",
@@ -163,7 +198,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Artificial Intelligence & Data Science (MSc)",
@@ -194,7 +236,14 @@
     "feeNonEU": "€363.36–726.72/semester",
     "feeNonEUNote": "verify current non-EU rate directly with FH Technikum Wien admissions",
     "feeApp": "No separate application fee confirmed; standard FH admission process",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "45 – 60 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Computer Science (MSc)",
@@ -220,7 +269,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate admission-procedure fee — only document upload required",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Points-based selection (up to 25 pts based on subject competencies, transcript GPA, and motivation statement).",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Software Engineering and Management (MSc)",
@@ -246,7 +302,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate admission-procedure fee — only document upload required",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "30 places",
+    "admissionProcess": "Points-based selection (up to 25 pts based on subject competencies, transcript GPA, and motivation statement).",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Information and Computer Engineering (MSc)",
@@ -272,7 +335,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate admission-procedure fee — only document upload required",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Points-based selection (up to 25 pts based on subject competencies, transcript GPA, and motivation statement).",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Data Science (MSc, NAWI Graz)",
@@ -300,7 +370,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate admission-procedure fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "40 places (joint NAWI Graz quota)",
+    "admissionProcess": "Points-based selection (up to 25 pts based on subject competencies, transcript GPA, and motivation statement).",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Software Engineering (MSc)",
@@ -326,7 +403,14 @@
     "feeEUNote": "FH Upper Austria (Oberösterreich) waives its statutory right to charge tuition — one of the FH exceptions nationally",
     "feeNonEU": "Verify directly — most FH OÖ non-EU students still pay the ÖH fee only, but confirm current policy",
     "feeApp": "No separate application fee; admission by interview",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "39 places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Softwarepark Hagenberg cluster, Dynatrace, Porsche Informatik, Fabasoft, BMW Group IT.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Interactive Media (MSc)",
@@ -352,7 +436,14 @@
     "feeEUNote": "FH Upper Austria (Oberösterreich) waives its statutory right to charge tuition — one of the FH exceptions nationally",
     "feeNonEU": "Verify directly — most FH OÖ non-EU students still pay the ÖH fee only, but confirm current policy",
     "feeApp": "No separate application fee; admission by interview",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "24 places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Media Informatics, Design/UX, Computer Science, or Human-Computer Interaction.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Softwarepark Hagenberg cluster, Dynatrace, Porsche Informatik, Fabasoft, BMW Group IT.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Cloud Computing Engineering (MSc)",
@@ -379,7 +470,14 @@
     "feeEUNote": "Hochschule Burgenland waives tuition entirely — one of only a few FHs nationally; a refundable €350 deposit is charged on admission and returned after semester 1",
     "feeNonEU": "Free (ÖH fee only) under the same policy — verify current non-EU terms directly",
     "feeApp": "No separate application fee beyond the refundable €350 admission deposit",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "30 study places",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Embedded Computing Systems (Dipl.-Ing.)",
@@ -405,7 +503,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Electrical Engineering, Computer Engineering, Informatics, or Mechatronics.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Embedded Systems Design (MSc)",
@@ -431,7 +536,14 @@
     "feeEUNote": "this specific programme's official listing states the standard FH rate applies (unlike FH OÖ's tuition-free Software Engineering / Interactive Media Masters) — confirm directly, as FH OÖ's tuition policy varies by programme",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee; merit-based scholarships available",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "23 places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Electrical Engineering, Computer Engineering, Informatics, or Mechatronics.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Softwarepark Hagenberg cluster, Dynatrace, Porsche Informatik, Fabasoft, BMW Group IT.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Embedded Systems (MSc)",
@@ -457,7 +569,14 @@
     "feeEUNote": "standard FH tuition, charged from semester 1 regardless of nationality",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed; standard FH admission process",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "45 – 60 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Electrical Engineering, Computer Engineering, Informatics, or Mechatronics.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Embedded Systems Engineering (MSc)",
@@ -482,7 +601,14 @@
     "feeEUNote": "FH Joanneum introduces the standard €363.36/sem tuition from WS 2026/27 for new students — check whether this programme's next intake is affected",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "30 – 45 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Electrical Engineering, Computer Engineering, Informatics, or Mechatronics.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Systems Design (MSc)",
@@ -508,7 +634,14 @@
     "feeEUNote": "figures conflict across aggregator sites — confirm the exact current fee directly with CUAS admissions before relying on this",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed; merit scholarships available (~€8,400 for year 1, deadline typically mid-May)",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "25 – 35 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Infineon Villach (mega fab), Lam Research, Intel Austria, CISC Semiconductor.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Artificial Intelligence and Cybersecurity (MSc)",
@@ -537,7 +670,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Cybersecurity and Ethical Hacking (MSc)",
@@ -564,7 +704,14 @@
     "feeEUNote": "FH Joanneum currently free for existing intakes but introduces the standard rate for new students from WS 2026/27 — this programme's third-party fee listing already shows the paid rate",
     "feeNonEU": "~€1,454/year (≈€727/semester)",
     "feeApp": "No separate application fee confirmed; FH Joanneum offers up to 6-7 application rounds per programme per cycle",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "30 – 45 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, IT Security, Computer Engineering, or Information Systems.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Cyber Security (DI, extra-occupational)",
@@ -591,7 +738,14 @@
     "feeEUNote": "standard FH tuition, charged from semester 1 regardless of nationality",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "15 places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, IT Security, Computer Engineering, or Information Systems.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Cyber Security and Resilience (MSc)",
@@ -617,7 +771,14 @@
     "feeEUNote": "standard FH tuition, charged from semester 1 regardless of nationality",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "35 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, IT Security, Computer Engineering, or Information Systems.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Secure Information Systems (MSc)",
@@ -643,7 +804,14 @@
     "feeEUNote": "FH Upper Austria (Oberösterreich) waives its statutory right to charge tuition on most of its Hagenberg Masters — confirm for this specific programme",
     "feeNonEU": "Verify directly — most FH OÖ non-EU students still pay the ÖH fee only, but confirm current policy",
     "feeApp": "No separate application fee; German-language proficiency required",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "24 – 39 study places per cohort",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Softwarepark Hagenberg cluster, Dynatrace, Porsche Informatik, Fabasoft, BMW Group IT.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "IT-Security (MSc)",
@@ -668,7 +836,14 @@
     "feeEUNote": "standard FH tuition, charged from semester 1 regardless of nationality",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed; standard FH admission process",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "45 – 60 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, IT Security, Computer Engineering, or Information Systems.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "IT-Security (MSc)",
@@ -693,7 +868,14 @@
     "feeEUNote": "standard FH tuition, charged from semester 1 regardless of nationality",
     "feeNonEU": "Verify current rate directly with admissions",
     "feeApp": "No separate application fee confirmed",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "40 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, IT Security, Computer Engineering, or Information Systems.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Data Science and Artificial Intelligence (MSc)",
@@ -723,7 +905,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee confirmed",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Mathematics, Statistics, or closely related STEM discipline (min. 30 ECTS in Math/Stats & 30 ECTS in CS).",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Machine Learning & Deep Learning (Dipl.-Ing. / MSc)",
@@ -753,7 +942,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Machine Learning & Deep Neural Systems (MSc)",
@@ -783,7 +979,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Dynatrace (Linz HQ), Voestalpine, KEBA, RISC Software, Audi AI Research Lab.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Machine Learning & Autonomous Intelligence (MSc)",
@@ -812,7 +1015,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate admission-procedure fee — only document upload required",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "AVL List, Infineon Technologies Austria, NXP Semiconductors, Magna Steyr, Silicon Austria Labs (SAL).",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Visual Computing & Computer Vision (Dipl.-Ing. / MSc)",
@@ -841,7 +1051,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Robotics & Autonomous Systems (Dipl.-Ing. / MSc)",
@@ -870,7 +1087,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Quantum Information & Computing (MSc)",
@@ -899,7 +1123,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Physics, Computer Science, or Mathematics with quantum mechanics and linear algebra core.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Alpine Quantum Technologies (AQT), IonQ Europe, Plan.See, MED-EL, Swarovski Digital.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Bioinformatics & Computational Biology (MSc)",
@@ -928,7 +1159,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Bioinformatics, Molecular Biology, Computer Science, or Life Sciences with demonstrated quantitative coursework.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Human-Computer Interaction (MSc)",
@@ -957,7 +1195,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Applied Machine Learning & AI Engineering (MSc)",
@@ -987,7 +1232,14 @@
     "feeEUNote": "FH Upper Austria waives tuition fees for qualified tech degrees",
     "feeNonEU": "Free / ÖH fee only",
     "feeApp": "No separate application fee; admission by interview",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "24 – 39 study places per cohort",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Softwarepark Hagenberg cluster, Dynatrace, Porsche Informatik, Fabasoft, BMW Group IT.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Distributed Systems & Cloud Computing (MSc)",
@@ -1016,7 +1268,14 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Robotics, Cognition, Intelligence (MSc)",
@@ -1046,7 +1305,14 @@
     "feeEUNote": "Regular public university model; nominal solidarity/student services fee",
     "feeNonEU": "€4,000–6,000/semester",
     "feeApp": "TUM Uni-Assist preliminary review fee applies",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "Selective cohort (~80 – 120 places)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field with demonstrated algorithmic foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Machine Learning & Data Engineering (MSc)",
@@ -1076,7 +1342,14 @@
     "feeEUNote": "Regular public university model; nominal solidarity/student services fee",
     "feeNonEU": "€4,000–6,000/semester",
     "feeApp": "TUM Uni-Assist preliminary review fee applies",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "Selective cohort (~80 – 120 places)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Computer Science, Artificial Intelligence, Informatics, or Mathematics with strong programming and linear algebra foundation.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Digital Healthcare & Medical Informatics (MSc)",
@@ -1105,7 +1378,14 @@
     "feeEUNote": "standard FH statutory tuition fee",
     "feeNonEU": "€363.36/semester",
     "feeApp": "No separate application fee",
-    "feeFree": false
+    "feeFree": false,
+    "seats": "35 study places",
+    "admissionProcess": "Two-stage admission: Formal dossier evaluation + personal technical interview / admission exam.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Bioinformatics, Molecular Biology, Computer Science, or Life Sciences with demonstrated quantitative coursework.",
+    "englishLevel": "German B2/C1 (ÖSD/Goethe Zertifikat) + English B2 for technical literature.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   },
   {
     "title": "Media Informatics (Dipl.-Ing. / MSc)",
@@ -1134,6 +1414,13 @@
     "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
     "feeNonEU": "€726.72/semester",
     "feeApp": "No separate application fee",
-    "feeFree": true
+    "feeFree": true,
+    "seats": "Open quota (No numeric cap for qualified applicants under UG 2002)",
+    "admissionProcess": "Direct admission upon academic equivalency check of qualifying Bachelor's degree; no entrance examination.",
+    "minDegree": "Bachelor's degree (min. 180 ECTS) in Media Informatics, Design/UX, Computer Science, or Human-Computer Interaction.",
+    "englishLevel": "English B2/C1 certified (IELTS 6.5 – 7.0, TOEFL iBT 87 – 95, or prior English-taught degree). No German required.",
+    "workRights": "Students permitted to work up to 20 hours/week during semester; 12-month Austrian Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation with fast-track permanent residence.",
+    "industryPartners": "Erste Group Digital, Austrian Institute of Technology (AIT), Siemens Austria, Red Bull Media House, Bitpanda, Amazon AWS Vienna.",
+    "duration": "4 Semesters (2 Years) · 120 ECTS"
   }
 ]

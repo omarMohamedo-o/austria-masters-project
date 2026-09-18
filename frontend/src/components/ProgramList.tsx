@@ -18,7 +18,16 @@ import {
   ArrowUpDown,
   X,
   Megaphone,
-  DollarSign
+  DollarSign,
+  Users,
+  CheckCircle2,
+  Briefcase,
+  Languages,
+  Clock,
+  ChevronDown,
+  ChevronUp,
+  Award,
+  FileText
 } from "lucide-react";
 
 export type Program = {
@@ -50,6 +59,14 @@ export type Program = {
   feeNonEU: string;
   feeApp?: string;
   feeFree?: boolean;
+  // Practical Admissions, Capacity & Career Specs
+  seats?: string;
+  admissionProcess?: string;
+  minDegree?: string;
+  englishLevel?: string;
+  workRights?: string;
+  industryPartners?: string;
+  duration?: string;
 };
 
 export type University = {
@@ -339,6 +356,11 @@ export default function ProgramList({
   const [dismissBanner, setDismissBanner] = useState(false);
   const [adRevenue, setAdRevenue] = useState(initialAds?.analytics?.revenue || 0.0);
   const [recentEarning, setRecentEarning] = useState<number | null>(null);
+  const [expandedSpecs, setExpandedSpecs] = useState<Record<string, boolean>>({});
+
+  const toggleSpecs = (id: string) => {
+    setExpandedSpecs((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const topBanner = initialAds?.topBanner || FALLBACK_ADS.topBanner;
   const inFeedAds = (initialAds?.inFeedAds && initialAds.inFeedAds.length > 0) ? initialAds.inFeedAds : FALLBACK_ADS.inFeedAds;
@@ -1095,11 +1117,19 @@ export default function ProgramList({
                           </a>
                         </div>
 
-                        {/* City & Country Tag */}
-                        <div className="flex items-center gap-2 mb-3">
+                        {/* City, Country, Seats, & Duration Quick Strip */}
+                        <div className="flex flex-wrap items-center gap-2 mb-3">
                           <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#18211f] text-slate-300 border border-[#2d3a36]">
                             <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
                             {city}, {country === "Germany" ? "🇩🇪 Germany" : "🇦🇹 Austria"}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/30 font-semibold">
+                            <Users className="w-3 h-3 text-amber-400 shrink-0" />
+                            {prog.seats || "Open quota"}
+                          </span>
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#18211f] text-slate-300 border border-[#2d3a36]">
+                            <Clock className="w-3 h-3 text-[#7ec8a7] shrink-0" />
+                            {prog.duration || "4 Sem. (120 ECTS)"}
                           </span>
                           <span className="text-xs px-2 py-0.5 rounded bg-[#18211f] text-slate-400 border border-[#2d3a36]">
                             {prog.lang || "English"}
@@ -1156,6 +1186,97 @@ export default function ProgramList({
                               </div>
                             </div>
                           </div>
+                        </div>
+
+                        {/* Interactive Admissions & Career Drawer */}
+                        <div className="mb-4">
+                          <button
+                            type="button"
+                            onClick={() => toggleSpecs(`${prog.title}-${prog.inst}`)}
+                            className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-[#141d1a] hover:bg-[#192522] border border-[#273430] hover:border-[#384a44] text-xs font-semibold text-[#7ec8a7] transition-all shadow-sm cursor-pointer"
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <FileText className="w-3.5 h-3.5 text-[#7ec8a7]" />
+                              Seats, Prerequisites & Career Specs
+                            </span>
+                            {expandedSpecs[`${prog.title}-${prog.inst}`] ? (
+                              <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                            ) : (
+                              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                            )}
+                          </button>
+
+                          {expandedSpecs[`${prog.title}-${prog.inst}`] && (
+                            <div className="mt-2.5 p-3.5 bg-[#080d0c] rounded-xl border border-[#232f2b] space-y-3 text-xs animate-in fade-in duration-200">
+                              {/* Seats & Intake Quota */}
+                              <div className="border-b border-[#182320] pb-2.5">
+                                <div className="flex items-center gap-1.5 text-amber-300 font-bold text-[11px] mb-1">
+                                  <Users className="w-3.5 h-3.5 text-amber-400" />
+                                  <span>Seats & Intake Quota</span>
+                                </div>
+                                <p className="text-slate-300 leading-relaxed pl-5 text-[11px]">
+                                  {prog.seats || "Open quota (No numeric cap under UG 2002 for qualified applicants)"}
+                                </p>
+                              </div>
+
+                              {/* Minimum Degree & Prerequisites */}
+                              <div className="border-b border-[#182320] pb-2.5">
+                                <div className="flex items-center gap-1.5 text-blue-300 font-bold text-[11px] mb-1">
+                                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                                  <span>Minimum Degree & Academic Prerequisites</span>
+                                </div>
+                                <p className="text-slate-300 leading-relaxed pl-5 text-[11px]">
+                                  {prog.minDegree || "Bachelor's degree (min. 180 ECTS) in Computer Science, Software Engineering, or related technical field."}
+                                </p>
+                              </div>
+
+                              {/* Selection / Admission Process */}
+                              <div className="border-b border-[#182320] pb-2.5">
+                                <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px] mb-1">
+                                  <Award className="w-3.5 h-3.5 text-purple-400" />
+                                  <span>Selection & Evaluation Process</span>
+                                </div>
+                                <p className="text-slate-300 leading-relaxed pl-5 text-[11px]">
+                                  {prog.admissionProcess || "Direct admission upon subject equivalence verification; no entrance exam."}
+                                </p>
+                              </div>
+
+                              {/* Language Requirements */}
+                              <div className="border-b border-[#182320] pb-2.5">
+                                <div className="flex items-center gap-1.5 text-emerald-300 font-bold text-[11px] mb-1">
+                                  <Languages className="w-3.5 h-3.5 text-emerald-400" />
+                                  <span>Language Requirements</span>
+                                </div>
+                                <p className="text-slate-300 leading-relaxed pl-5 text-[11px]">
+                                  {prog.englishLevel || "English B2/C1 certified (IELTS 6.5+ or TOEFL 87+)."}
+                                </p>
+                              </div>
+
+                              {/* Post-Study Visa & Student Work Rights */}
+                              <div className="border-b border-[#182320] pb-2.5">
+                                <div className="flex items-center gap-1.5 text-teal-300 font-bold text-[11px] mb-1">
+                                  <Briefcase className="w-3.5 h-3.5 text-teal-400" />
+                                  <span>Work Rights & Post-Graduation Visa</span>
+                                </div>
+                                <p className="text-slate-300 leading-relaxed pl-5 text-[11px]">
+                                  {prog.workRights || "Students permitted to work 20h/week during studies; 12-month Job-Seeker Visa (Rot-Weiß-Rot-Karte) granted upon graduation."}
+                                </p>
+                              </div>
+
+                              {/* Industry Collaborators */}
+                              {prog.industryPartners && (
+                                <div>
+                                  <div className="flex items-center gap-1.5 text-slate-300 font-bold text-[11px] mb-1">
+                                    <Building2 className="w-3.5 h-3.5 text-[#7ec8a7]" />
+                                    <span>Industry Partners & Thesis Sponsors</span>
+                                  </div>
+                                  <p className="text-slate-400 leading-relaxed pl-5 text-[11px]">
+                                    {prog.industryPartners}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* Tags */}

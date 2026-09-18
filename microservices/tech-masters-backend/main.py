@@ -300,6 +300,13 @@ class Program(BaseModel):
     applyUrl: str
     feeEU: str
     feeNonEU: str
+    seats: Optional[str] = "Open quota"
+    admissionProcess: Optional[str] = None
+    minDegree: Optional[str] = None
+    englishLevel: Optional[str] = None
+    workRights: Optional[str] = None
+    industryPartners: Optional[str] = None
+    duration: Optional[str] = "4 Semesters (2 Years) · 120 ECTS"
 
     class Config:
         extra = "allow"
