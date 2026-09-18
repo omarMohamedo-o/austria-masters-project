@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -16,8 +16,9 @@ import {
   Building2,
   RotateCcw,
   ArrowUpDown,
-  Filter,
-  X
+  X,
+  Megaphone,
+  DollarSign
 } from "lucide-react";
 
 export type Program = {
@@ -64,7 +65,66 @@ export type University = {
   programs_count?: number;
 };
 
-// Fallback universities data in case backend is offline
+export type Ad = {
+  id: string;
+  type: string;
+  slot: string;
+  client: string;
+  title: string;
+  tagline: string;
+  description: string;
+  cta: string;
+  url: string;
+  cpc: number;
+  badge: string;
+};
+
+// Fallback in case ads microservice is starting
+const FALLBACK_ADS: { topBanner: Ad; inFeedAds: Ad[] } = {
+  topBanner: {
+    id: "ad_scholarship_oead",
+    type: "banner",
+    slot: "top_banner",
+    client: "ÖAD Austrian Agency for Education",
+    title: "Austrian Government Tech Scholarships 2026/27",
+    tagline: "Fully Funded Master's Grants for International & EU Students",
+    description: "Receive up to €1,200/month living stipend + tuition waiver for Austrian universities.",
+    cta: "Apply for Scholarship",
+    url: "https://grants.at/en/",
+    cpc: 0.85,
+    badge: "Official Grant"
+  },
+  inFeedAds: [
+    {
+      id: "ad_cloud_credits",
+      type: "card",
+      slot: "in_feed",
+      client: "Google Cloud for Students",
+      title: "Google Cloud Computing Student Fellowship",
+      tagline: "Free $300 Credits + Professional AI Certifications",
+      description: "Accelerate your Master's research in AI or Data Science with high-performance TPU/GPU clusters, certified mentoring, and internship tracks across Europe.",
+      cta: "Claim $300 Student Credits",
+      url: "https://cloud.google.com/edu/students",
+      cpc: 1.20,
+      badge: "Sponsored Partner"
+    },
+    {
+      id: "ad_german_b2",
+      type: "card",
+      slot: "in_feed",
+      client: "Goethe-Institut & ÖSD Prep",
+      title: "Fast-Track German B2 Admission Certificate",
+      tagline: "100% Online Intensive Courses for University Entry",
+      description: "Get your required German B2 language certificate in 8 weeks with certified native tutors before Austrian winter semester deadlines close.",
+      cta: "Explore Prep Courses",
+      url: "https://www.osd.at/en/",
+      cpc: 0.65,
+      badge: "Language Partner"
+    }
+  ]
+};
+
+// Fallback universities data
 const FALLBACK_UNIVERSITIES: University[] = [
   {
     name: "University of Vienna (Universität Wien)",
@@ -245,63 +305,17 @@ const FALLBACK_UNIVERSITIES: University[] = [
     website: "https://www.hochschule-burgenland.at",
     description: "Cloud computing and business informatics applied programs.",
     programs_count: 1
-  },
-  {
-    name: "Technical University of Munich (TUM)",
-    short_name: "TUM Munich",
-    city: "Munich",
-    country: "Germany",
-    rank_world: 28,
-    rank_country: 1,
-    type: "University of Excellence",
-    website: "https://www.tum.de",
-    description: "Germany's #1 university, internationally acclaimed for Informatics, Robotics, and Artificial Intelligence.",
-    programs_count: 0
-  },
-  {
-    name: "LMU Munich",
-    short_name: "LMU Munich",
-    city: "Munich",
-    country: "Germany",
-    rank_world: 54,
-    rank_country: 2,
-    type: "University of Excellence",
-    website: "https://www.lmu.de",
-    description: "Elite German research university offering world-class programs in Data Science and Machine Learning.",
-    programs_count: 0
-  },
-  {
-    name: "RWTH Aachen University",
-    short_name: "RWTH Aachen",
-    city: "Aachen",
-    country: "Germany",
-    rank_world: 99,
-    rank_country: 3,
-    type: "Technical University",
-    website: "https://www.rwth-aachen.de",
-    description: "Top-tier German technical university known for computer engineering and systems software.",
-    programs_count: 0
-  },
-  {
-    name: "Technical University of Berlin (TU Berlin)",
-    short_name: "TU Berlin",
-    city: "Berlin",
-    country: "Germany",
-    rank_world: 147,
-    rank_country: 4,
-    type: "Technical University",
-    website: "https://www.tu.berlin",
-    description: "Leading European technical university specializing in big data, cloud computing, and AI architectures.",
-    programs_count: 0
   }
 ];
 
 export default function ProgramList({
   initialPrograms,
-  initialUniversities
+  initialUniversities,
+  initialAds
 }: {
   initialPrograms: Program[];
   initialUniversities?: University[];
+  initialAds?: { topBanner?: Ad; inFeedAds?: Ad[]; analytics?: any };
 }) {
   // Views
   const [activeTab, setActiveTab] = useState<"programs" | "universities">("programs");
@@ -321,9 +335,39 @@ export default function ProgramList({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<"rank_world" | "rank_country" | "deadline" | "tuition" | "name">("rank_world");
 
+  // Ads & Monetization State
+  const [dismissBanner, setDismissBanner] = useState(false);
+  const [adRevenue, setAdRevenue] = useState(initialAds?.analytics?.revenue || 0.0);
+  const [recentEarning, setRecentEarning] = useState<number | null>(null);
+
+  const topBanner = initialAds?.topBanner || FALLBACK_ADS.topBanner;
+  const inFeedAds = (initialAds?.inFeedAds && initialAds.inFeedAds.length > 0) ? initialAds.inFeedAds : FALLBACK_ADS.inFeedAds;
+
   const universitiesList = useMemo(() => {
     return (initialUniversities && initialUniversities.length > 0) ? initialUniversities : FALLBACK_UNIVERSITIES;
   }, [initialUniversities]);
+
+  // Handle Ad click and send analytics to port 4000
+  const handleAdClick = async (adId: string) => {
+    try {
+      const res = await fetch("http://localhost:4000/api/ads/click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adId })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAdRevenue(data.totalRevenue);
+        setRecentEarning(data.earnings);
+        setTimeout(() => setRecentEarning(null), 3000);
+      }
+    } catch {
+      // Fallback local simulation
+      setAdRevenue((prev: number) => parseFloat((prev + 0.85).toFixed(2)));
+      setRecentEarning(0.85);
+      setTimeout(() => setRecentEarning(null), 3000);
+    }
+  };
 
   // Extract cities
   const availableCities = [
@@ -502,626 +546,731 @@ export default function ProgramList({
   }, [universitiesList, filterCountry, filterCity]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      {/* Top Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-[#212b28] pb-6">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7ec8a7]/10 border border-[#7ec8a7]/30 text-[#7ec8a7] text-xs font-semibold uppercase tracking-wider mb-2.5">
-            <Sparkles className="w-3.5 h-3.5" />
-            Global Tech Masters Portal
-          </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-2 text-white">
-            Tech Masters Tracker
-          </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
-            Real-time verified deadlines, world university rankings, and official admission sites for Computer Science, AI, and Data Science degrees.
-          </p>
-        </div>
-
-        {/* View Switcher Tabs */}
-        <div className="flex items-center bg-[#141d1a] p-1.5 rounded-2xl border border-[#273430] shadow-sm">
-          <button
-            onClick={() => setActiveTab("programs")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              activeTab === "programs"
-                ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
-                : "text-slate-300 hover:text-white"
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>Programs ({filteredPrograms.length})</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("universities")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-              activeTab === "universities"
-                ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
-                : "text-slate-300 hover:text-white"
-            }`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>Universities ({universitiesList.length})</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Screenshot 1 Exact Customized Pill Filter Box */}
-      <div className="bg-[#0e1413] border border-[#232f2b] rounded-2xl p-5 sm:p-7 mb-6 shadow-2xl space-y-6">
-        {/* Row 1: Status */}
-        <div>
-          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Status</span>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {statusOptions.map((opt) => {
-              const active = filterStatus === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilterStatus(opt.value)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
+    <div className="w-full">
+      {/* 1. TOP SPONSORED BANNER (Live from Ads Microservice on port 4000) */}
+      {topBanner && !dismissBanner && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-[#7ec8a7]/15 to-blue-500/15 border-b border-amber-500/30 py-2.5 px-4 text-xs sm:text-sm shadow-md">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/40 flex items-center gap-1">
+                <Megaphone className="w-3 h-3 text-amber-400" />
+                SPONSORED
+              </span>
+              <span className="font-bold text-white">{topBanner.title}:</span>
+              <span className="text-slate-300 hidden md:inline">{topBanner.tagline}</span>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <a
+                href={topBanner.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => handleAdClick(topBanner.id)}
+                className="inline-flex items-center gap-1 font-bold text-amber-300 hover:text-amber-200 underline text-xs transition-colors"
+              >
+                {topBanner.cta} <ExternalLink className="w-3 h-3" />
+              </a>
+              <button
+                onClick={() => setDismissBanner(true)}
+                className="text-slate-400 hover:text-white p-1"
+                title="Dismiss Banner"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Row 2: Field */}
-        <div>
-          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Field</span>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {fieldOptions.map((opt) => {
-              const active = filterField === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilterField(opt.value)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
+      <div className="w-full max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Top Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-6 border-b border-[#212b28] pb-6">
+          <div>
+            <div className="flex items-center gap-3 mb-2.5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#7ec8a7]/10 border border-[#7ec8a7]/30 text-[#7ec8a7] text-xs font-semibold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                Global Tech Masters Portal
+              </div>
+
+              {/* Live Monetization Microservice Active Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+                <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Ads Engine Online</span>
+                <span className="font-bold text-white ml-1">${adRevenue.toFixed(2)} earned</span>
+                {recentEarning && (
+                  <span className="text-emerald-300 text-[10px] font-bold animate-bounce ml-0.5">
+                    +${recentEarning.toFixed(2)}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-2 text-white">
+              Tech Masters Tracker
+            </h1>
+            <p className="text-slate-400 text-sm sm:text-base max-w-2xl">
+              Real-time verified deadlines, world university rankings, and official admission sites for Computer Science, AI, and Data Science degrees.
+            </p>
           </div>
-        </div>
 
-        {/* Row 3: Language */}
-        <div>
-          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Language</span>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {languageOptions.map((opt) => {
-              const active = filterLanguage === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => setFilterLanguage(opt.value)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Row 4: Geographical Search - Country */}
-        <div className="pt-2 border-t border-[#1f2c27]">
-          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-            <Globe className="w-3.5 h-3.5 text-[#7ec8a7]" />
-            Country
-          </span>
-          <div className="flex flex-wrap items-center gap-2.5">
-            {countryOptions.map((opt) => {
-              const active = filterCountry === opt.value;
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => {
-                    setFilterCountry(opt.value);
-                    setFilterCity("all");
-                  }}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Row 5: Geographical Search - City */}
-        <div>
-          <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-            <MapPin className="w-3.5 h-3.5 text-blue-400" />
-            City
-          </span>
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* View Switcher Tabs */}
+          <div className="flex items-center bg-[#141d1a] p-1.5 rounded-2xl border border-[#273430] shadow-sm">
             <button
-              onClick={() => setFilterCity("all")}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                filterCity === "all"
-                  ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                  : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+              onClick={() => setActiveTab("programs")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "programs"
+                  ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
+                  : "text-slate-300 hover:text-white"
               }`}
             >
-              All cities
+              <GraduationCap className="w-4 h-4" />
+              <span>Programs ({filteredPrograms.length})</span>
             </button>
-            {availableCities.map((city) => {
-              const active = filterCity === city;
-              return (
-                <button
-                  key={city}
-                  onClick={() => setFilterCity(city)}
-                  className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                    active
-                      ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                      : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                  }`}
-                >
-                  {city}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Row 6: University Rankings & Tuition */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2 border-t border-[#1f2c27]">
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              University Ranking Tier
-            </span>
-            <div className="flex flex-wrap items-center gap-2">
-              {rankingOptions.map((opt) => {
-                const active = filterRanking === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterRanking(opt.value)}
-                    className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-              <Banknote className="w-3.5 h-3.5 text-emerald-400" />
-              Tuition Cost
-            </span>
-            <div className="flex flex-wrap items-center gap-2">
-              {tuitionOptions.map((opt) => {
-                const active = filterTuition === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterTuition(opt.value)}
-                    className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Row 7: Keyword Search & Sort Controls */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-3 border-t border-[#1f2c27]">
-          {/* Keyword Search Input */}
-          <div className="relative flex-1 max-w-lg">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Search by keywords (e.g. AI, TU Wien, algorithms, cyber, Linz)..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
-            />
-            {searchTerm && (
-              <button
-                onClick={() => setSearchTerm("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-
-          {/* Sort Selector & Reset */}
-          <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
-            <ArrowUpDown className="w-4 h-4 text-slate-400 shrink-0" />
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-[#141d1a] border border-[#273430] text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+            <button
+              onClick={() => setActiveTab("universities")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                activeTab === "universities"
+                  ? "bg-[#7ec8a7] text-[#0d1613] shadow-md font-bold"
+                  : "text-slate-300 hover:text-white"
+              }`}
             >
-              <option value="rank_world">🌐 QS World Rank (Best first)</option>
-              <option value="rank_country">🏆 Country Rank (#1 in Austria)</option>
-              <option value="deadline">⏰ Deadline (Closing soonest)</option>
-              <option value="tuition">💰 Tuition (Free / Lowest first)</option>
-              <option value="name">🔤 Program Name (A - Z)</option>
-            </select>
-
-            {hasActiveFilters && (
-              <button
-                onClick={resetFilters}
-                className="flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 border border-rose-500/30 px-3 py-2 rounded-xl transition-all font-semibold"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                Reset Filters
-              </button>
-            )}
+              <Building2 className="w-4 h-4" />
+              <span>Universities ({universitiesList.length})</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Screenshot 2 Exact Meta Bar */}
-      <div className="flex flex-wrap items-center justify-between text-xs sm:text-sm text-slate-400 mb-8 px-2 py-1">
-        <div className="flex items-center gap-6">
-          <span>
-            As of <strong className="text-slate-200 font-bold">18 September 2026</strong>
-          </span>
-          <span>
-            <strong className="text-slate-200 font-bold">{initialPrograms.length}</strong> programmes tracked
-          </span>
-          {hasActiveFilters && (
-            <span className="text-[#7ec8a7] font-semibold">
-              ({filteredPrograms.length} matching your customized search)
+        {/* Screenshot 1 Exact Customized Pill Filter Box */}
+        <div className="bg-[#0e1413] border border-[#232f2b] rounded-2xl p-5 sm:p-7 mb-6 shadow-2xl space-y-6">
+          {/* Row 1: Status */}
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Status</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {statusOptions.map((opt) => {
+                const active = filterStatus === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterStatus(opt.value)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 2: Field */}
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Field</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {fieldOptions.map((opt) => {
+                const active = filterField === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterField(opt.value)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 3: Language */}
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Language</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {languageOptions.map((opt) => {
+                const active = filterLanguage === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterLanguage(opt.value)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 4: Geographical Search - Country */}
+          <div className="pt-2 border-t border-[#1f2c27]">
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#7ec8a7]" />
+              Country
+            </span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {countryOptions.map((opt) => {
+                const active = filterCountry === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      setFilterCountry(opt.value);
+                      setFilterCity("all");
+                    }}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 5: Geographical Search - City */}
+          <div>
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-blue-400" />
+              City
+            </span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={() => setFilterCity("all")}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                  filterCity === "all"
+                    ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                    : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                }`}
+              >
+                All cities
+              </button>
+              {availableCities.map((city) => {
+                const active = filterCity === city;
+                return (
+                  <button
+                    key={city}
+                    onClick={() => setFilterCity(city)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {city}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 6: University Rankings & Tuition */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2 border-t border-[#1f2c27]">
+            <div>
+              <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                University Ranking Tier
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                {rankingOptions.map((opt) => {
+                  const active = filterRanking === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => setFilterRanking(opt.value)}
+                      className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                        active
+                          ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                          : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+                <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+                Tuition Cost
+              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                {tuitionOptions.map((opt) => {
+                  const active = filterTuition === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      onClick={() => setFilterTuition(opt.value)}
+                      className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
+                        active
+                          ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                          : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Row 7: Keyword Search & Sort Controls */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-3 border-t border-[#1f2c27]">
+            {/* Keyword Search Input */}
+            <div className="relative flex-1 max-w-lg">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by keywords (e.g. AI, TU Wien, algorithms, cyber, Linz)..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-10 py-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Sort Selector & Reset */}
+            <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
+              <ArrowUpDown className="w-4 h-4 text-slate-400 shrink-0" />
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="bg-[#141d1a] border border-[#273430] text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+              >
+                <option value="rank_world">🌐 QS World Rank (Best first)</option>
+                <option value="rank_country">🏆 Country Rank (#1 in Austria)</option>
+                <option value="deadline">⏰ Deadline (Closing soonest)</option>
+                <option value="tuition">💰 Tuition (Free / Lowest first)</option>
+                <option value="name">🔤 Program Name (A - Z)</option>
+              </select>
+
+              {hasActiveFilters && (
+                <button
+                  onClick={resetFilters}
+                  className="flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 border border-rose-500/30 px-3 py-2 rounded-xl transition-all font-semibold"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Reset Filters
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Screenshot 2 Exact Meta Bar */}
+        <div className="flex flex-wrap items-center justify-between text-xs sm:text-sm text-slate-400 mb-8 px-2 py-1">
+          <div className="flex items-center gap-6">
+            <span>
+              As of <strong className="text-slate-200 font-bold">18 September 2026</strong>
+            </span>
+            <span>
+              <strong className="text-slate-200 font-bold">{initialPrograms.length}</strong> programmes tracked
+            </span>
+            {hasActiveFilters && (
+              <span className="text-[#7ec8a7] font-semibold">
+                ({filteredPrograms.length} matching your customized search)
+              </span>
+            )}
+          </div>
+
+          {filterCity !== "all" && (
+            <span className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2.5 py-0.5 rounded-full">
+              <MapPin className="w-3 h-3" /> Filtering in {filterCity}
             </span>
           )}
         </div>
 
-        {filterCity !== "all" && (
-          <span className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 px-2.5 py-0.5 rounded-full">
-            <MapPin className="w-3 h-3" /> Filtering in {filterCity}
-          </span>
+        {/* TAB 1: PROGRAMS GRID WITH IN-FEED SPONSORED CARDS */}
+        {activeTab === "programs" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
+            <AnimatePresence>
+              {filteredPrograms.map((prog, idx) => {
+                const city = prog.city || (prog.inst.toLowerCase().includes("vienna") ? "Vienna" :
+                  prog.inst.toLowerCase().includes("linz") ? "Linz" :
+                  prog.inst.toLowerCase().includes("graz") ? "Graz" :
+                  prog.inst.toLowerCase().includes("salzburg") ? "Salzburg" :
+                  prog.inst.toLowerCase().includes("innsbruck") ? "Innsbruck" :
+                  prog.inst.toLowerCase().includes("hagenberg") ? "Hagenberg" :
+                  prog.inst.toLowerCase().includes("klagenfurt") ? "Klagenfurt" :
+                  prog.inst.toLowerCase().includes("pölten") || prog.inst.toLowerCase().includes("ustp") ? "St. Pölten" :
+                  prog.inst.toLowerCase().includes("villach") ? "Villach" :
+                  prog.inst.toLowerCase().includes("eisenstadt") ? "Eisenstadt" : "Vienna");
+
+                const country = prog.country || (prog.inst.toLowerCase().includes("munich") || prog.inst.toLowerCase().includes("berlin") || prog.inst.toLowerCase().includes("aachen") ? "Germany" : "Austria");
+
+                const worldRank = prog.uni_rank_world || (
+                  prog.inst.toLowerCase().includes("vienna") && !prog.inst.toLowerCase().includes("tu") ? 130 :
+                  prog.inst.toLowerCase().includes("tu wien") ? 190 :
+                  prog.inst.toLowerCase().includes("innsbruck") ? 362 :
+                  prog.inst.toLowerCase().includes("tu graz") ? 421 :
+                  prog.inst.toLowerCase().includes("jku") || prog.inst.toLowerCase().includes("linz") ? 446 :
+                  prog.inst.toLowerCase().includes("klagenfurt") ? 580 :
+                  prog.inst.toLowerCase().includes("salzburg") && !prog.inst.toLowerCase().includes("fh") ? 681 :
+                  prog.inst.toLowerCase().includes("hagenberg") ? 800 : 850
+                );
+
+                const countryRank = prog.uni_rank_country || (
+                  worldRank === 130 ? 1 :
+                  worldRank === 190 ? 2 :
+                  worldRank === 362 ? 3 :
+                  worldRank === 421 ? 4 :
+                  worldRank === 446 ? 5 :
+                  worldRank === 580 ? 6 :
+                  worldRank === 681 ? 7 : 8
+                );
+
+                const uniUrl = prog.uni_url || (
+                  prog.inst.toLowerCase().includes("tu wien") ? "https://www.tuwien.at" :
+                  prog.inst.toLowerCase().includes("vienna") ? "https://www.univie.ac.at" :
+                  prog.inst.toLowerCase().includes("jku") ? "https://www.jku.at" :
+                  prog.inst.toLowerCase().includes("tu graz") ? "https://www.tugraz.at" :
+                  prog.inst.toLowerCase().includes("innsbruck") ? "https://www.uibk.ac.at" :
+                  prog.inst.toLowerCase().includes("hagenberg") ? "https://www.fh-ooe.at/campus-hagenberg/" : "https://www.studienwahl.at"
+                );
+
+                // Check if we should insert an In-Feed Ad at position 2 or 5
+                const adIndex = idx === 2 ? 0 : idx === 5 ? 1 : -1;
+                const inFeedAd = adIndex >= 0 && inFeedAds[adIndex] ? inFeedAds[adIndex] : null;
+
+                return (
+                  <div key={`${prog.title}-${prog.inst}`} className="contents">
+                    {/* In-feed Sponsored Ad Card */}
+                    {inFeedAd && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-gradient-to-b from-[#18201a] to-[#0e1411] border border-amber-500/50 hover:border-amber-400 rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-xl shadow-amber-950/20 transition-all duration-300 h-full"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-3.5">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-extrabold uppercase tracking-wider">
+                              <Sparkles className="w-3 h-3 text-amber-400" />
+                              SPONSORED
+                            </span>
+                            <span className="text-xs text-amber-200/70 font-semibold">{inFeedAd.badge}</span>
+                          </div>
+
+                          <span className="text-xs font-medium text-slate-400 block mb-1">
+                            {inFeedAd.client}
+                          </span>
+
+                          <h3 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug hover:text-amber-300 transition-colors">
+                            {inFeedAd.title}
+                          </h3>
+
+                          <p className="text-xs font-semibold text-teal-300 mb-3">
+                            {inFeedAd.tagline}
+                          </p>
+
+                          <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
+                            {inFeedAd.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-4 border-t border-amber-500/20 mt-auto">
+                          <a
+                            href={inFeedAd.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={() => handleAdClick(inFeedAd.id)}
+                            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs sm:text-sm shadow-md transition-all active:scale-95"
+                          >
+                            <span>{inFeedAd.cta}</span>
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </a>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Program Card */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.25, delay: Math.min(idx * 0.02, 0.25) }}
+                      className="group bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 hover:shadow-2xl hover:shadow-[#7ec8a7]/5 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
+                    >
+                      {/* Card Content */}
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col">
+                        {/* Header Row: Status, World Rank, and Field */}
+                        <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${
+                            prog.status === "open"
+                              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+                              : prog.status === "soon"
+                              ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                              : "bg-rose-500/10 border-rose-500/25 text-rose-300"
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${prog.status === "open" ? "bg-emerald-400 animate-pulse" : prog.status === "soon" ? "bg-amber-400" : "bg-rose-400"}`} />
+                            <span className="truncate max-w-[160px]">{prog.statusLabel || (prog.status === "open" ? "Open Now" : "Closed")}</span>
+                          </span>
+
+                          {/* World Ranking Badge */}
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                            <Trophy className="w-3 h-3 text-amber-400" />
+                            QS #{worldRank} · #{countryRank} in {country}
+                          </span>
+
+                          {/* Field Tag */}
+                          <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-[#7ec8a7] border border-teal-500/20">
+                            {prog.field}
+                          </span>
+                        </div>
+
+                        {/* Program Title */}
+                        <h2 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug group-hover:text-[#7ec8a7] transition-colors">
+                          {prog.title}
+                        </h2>
+
+                        {/* Institution & Geographical Location */}
+                        <div className="flex flex-wrap items-center gap-2 text-slate-400 text-xs sm:text-sm font-medium mb-3">
+                          <div className="flex items-center gap-1.5 text-slate-300">
+                            <Building2 className="w-3.5 h-3.5 text-[#7ec8a7] shrink-0" />
+                            <span className="truncate font-semibold">{prog.inst}</span>
+                          </div>
+                          <a
+                            href={uniUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[11px] text-teal-400 hover:underline flex items-center gap-0.5 shrink-0"
+                            title="Visit Official University Portal"
+                          >
+                            Official Site <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        </div>
+
+                        {/* City & Country Tag */}
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#18211f] text-slate-300 border border-[#2d3a36]">
+                            <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
+                            {city}, {country === "Germany" ? "🇩🇪 Germany" : "🇦🇹 Austria"}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded bg-[#18211f] text-slate-400 border border-[#2d3a36]">
+                            {prog.lang || "English"}
+                          </span>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-slate-400 text-xs sm:text-sm mb-4 line-clamp-3 leading-relaxed">
+                          {prog.desc}
+                        </p>
+
+                        {/* Deadlines & Tuition 2x2 Info Grid (ZERO OVERLAP) */}
+                        <div className="bg-[#080d0c] rounded-xl border border-[#232f2b] p-3.5 space-y-3 mb-4">
+                          {/* Deadlines */}
+                          <div>
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlines</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Students</span>
+                                <span className="text-slate-200 font-medium break-words leading-tight block">
+                                  {prog.deadlineEU || "See official site"}
+                                </span>
+                              </div>
+                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Students</span>
+                                <span className="text-slate-200 font-medium break-words leading-tight block">
+                                  {prog.deadlineNonEU || "See official site"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Tuition Fees */}
+                          <div className="pt-2.5 border-t border-[#232f2b]">
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <Banknote className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tuition Fees</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Tuition</span>
+                                <span className="text-slate-200 font-medium break-words leading-tight block">
+                                  {prog.feeEU || "Free / ÖH fee only"}
+                                </span>
+                              </div>
+                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Tuition</span>
+                                <span className="text-slate-200 font-medium break-words leading-tight block">
+                                  {prog.feeNonEU || "Standard rate"}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Tags */}
+                        {prog.tags && prog.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mb-2">
+                            {prog.tags.map((t) => (
+                              <span
+                                key={t}
+                                className="px-2 py-0.5 bg-[#18211f] border border-[#2d3a36] text-slate-300 text-[11px] font-medium rounded-md"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="p-3.5 sm:p-4 bg-[#080d0c] border-t border-[#232f2b] grid grid-cols-2 gap-3 mt-auto">
+                        <a
+                          href={prog.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#18211f] hover:bg-[#273430] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#2d3a36] active:scale-95"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+                          <span>Details</span>
+                        </a>
+                        <a
+                          href={prog.applyUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 ${
+                            prog.status === "open"
+                              ? "bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] border-[#7ec8a7] shadow-md shadow-[#7ec8a7]/20 font-bold"
+                              : "bg-[#18211f] hover:bg-[#273430] text-slate-400 border-[#2d3a36] cursor-not-allowed"
+                          }`}
+                          onClick={(e) => {
+                            if (prog.status !== "open") e.preventDefault();
+                          }}
+                        >
+                          <GraduationCap className="w-4 h-4 shrink-0" />
+                          <span>Apply Now</span>
+                        </a>
+                      </div>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* TAB 2: UNIVERSITIES DIRECTORY */}
+        {activeTab === "universities" && (
+          <div className="space-y-10">
+            {Object.entries(universitiesByCountry).map(([countryName, uList]) => (
+              <div key={countryName} className="space-y-4">
+                <div className="flex items-center gap-3 border-b border-[#232f2b] pb-3">
+                  <span className="text-2xl">{countryName === "Austria" ? "🇦🇹" : countryName === "Germany" ? "🇩🇪" : "🇨🇭"}</span>
+                  <h2 className="text-2xl font-bold text-white">{countryName} Universities</h2>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-[#7ec8a7]/10 text-[#7ec8a7] border border-[#7ec8a7]/30 font-semibold ml-auto">
+                    {uList.length} Institutions
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {uList.map((uni) => (
+                    <div
+                      key={uni.name}
+                      className="bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 rounded-2xl p-5 flex flex-col justify-between transition-all hover:shadow-xl shadow-black/40"
+                    >
+                      <div>
+                        {/* Top Rank Badge */}
+                        <div className="flex items-center justify-between gap-2 mb-3">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs font-bold">
+                            <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                            QS World #{uni.rank_world}
+                          </span>
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-semibold">
+                            #{uni.rank_country} in {uni.country}
+                          </span>
+                        </div>
+
+                        {/* University Title & City */}
+                        <h3 className="text-lg font-bold text-white mb-1.5 leading-snug">
+                          {uni.name}
+                        </h3>
+                        <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-3">
+                          <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                          <span>{uni.city}, {uni.country}</span>
+                          <span className="text-slate-600">•</span>
+                          <span className="text-slate-400">{uni.type}</span>
+                        </div>
+
+                        <p className="text-slate-400 text-xs leading-relaxed mb-4 line-clamp-3">
+                          {uni.description}
+                        </p>
+                      </div>
+
+                      {/* Footer Actions */}
+                      <div className="pt-4 border-t border-[#232f2b] flex items-center justify-between gap-3">
+                        <a
+                          href={uni.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300 transition-colors"
+                        >
+                          <Globe className="w-3.5 h-3.5" />
+                          Official Site <ExternalLink className="w-3 h-3" />
+                        </a>
+
+                        <button
+                          onClick={() => {
+                            setSearchTerm(uni.short_name);
+                            setActiveTab("programs");
+                          }}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#18211f] hover:bg-[#7ec8a7] hover:text-[#0f1a16] text-slate-200 text-xs font-semibold border border-[#2d3a36] transition-all"
+                        >
+                          <GraduationCap className="w-3.5 h-3.5" />
+                          View Programs
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {filteredPrograms.length === 0 && activeTab === "programs" && (
+          <div className="text-center py-20 text-slate-500 bg-[#0e1413]/60 border border-[#232f2b] rounded-3xl mt-6 p-8">
+            <ShieldAlert className="w-12 h-12 mx-auto mb-3 text-slate-600" />
+            <h3 className="text-lg font-semibold text-slate-300 mb-1">No Programs Found</h3>
+            <p className="text-sm max-w-md mx-auto mb-4">
+              No degrees matched your customized search filters. Try clearing some selections.
+            </p>
+            <button
+              onClick={resetFilters}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7ec8a7] text-[#0f1a16] text-xs font-bold hover:bg-teal-400 transition-all shadow-md"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset All Filters
+            </button>
+          </div>
         )}
       </div>
-
-      {/* TAB 1: PROGRAMS GRID */}
-      {activeTab === "programs" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
-          <AnimatePresence>
-            {filteredPrograms.map((prog, idx) => {
-              const city = prog.city || (prog.inst.toLowerCase().includes("vienna") ? "Vienna" :
-                prog.inst.toLowerCase().includes("linz") ? "Linz" :
-                prog.inst.toLowerCase().includes("graz") ? "Graz" :
-                prog.inst.toLowerCase().includes("salzburg") ? "Salzburg" :
-                prog.inst.toLowerCase().includes("innsbruck") ? "Innsbruck" :
-                prog.inst.toLowerCase().includes("hagenberg") ? "Hagenberg" :
-                prog.inst.toLowerCase().includes("klagenfurt") ? "Klagenfurt" :
-                prog.inst.toLowerCase().includes("pölten") || prog.inst.toLowerCase().includes("ustp") ? "St. Pölten" :
-                prog.inst.toLowerCase().includes("villach") ? "Villach" :
-                prog.inst.toLowerCase().includes("eisenstadt") ? "Eisenstadt" : "Vienna");
-
-              const country = prog.country || (prog.inst.toLowerCase().includes("munich") || prog.inst.toLowerCase().includes("berlin") || prog.inst.toLowerCase().includes("aachen") ? "Germany" : "Austria");
-
-              const worldRank = prog.uni_rank_world || (
-                prog.inst.toLowerCase().includes("vienna") && !prog.inst.toLowerCase().includes("tu") ? 130 :
-                prog.inst.toLowerCase().includes("tu wien") ? 190 :
-                prog.inst.toLowerCase().includes("innsbruck") ? 362 :
-                prog.inst.toLowerCase().includes("tu graz") ? 421 :
-                prog.inst.toLowerCase().includes("jku") || prog.inst.toLowerCase().includes("linz") ? 446 :
-                prog.inst.toLowerCase().includes("klagenfurt") ? 580 :
-                prog.inst.toLowerCase().includes("salzburg") && !prog.inst.toLowerCase().includes("fh") ? 681 :
-                prog.inst.toLowerCase().includes("hagenberg") ? 800 : 850
-              );
-
-              const countryRank = prog.uni_rank_country || (
-                worldRank === 130 ? 1 :
-                worldRank === 190 ? 2 :
-                worldRank === 362 ? 3 :
-                worldRank === 421 ? 4 :
-                worldRank === 446 ? 5 :
-                worldRank === 580 ? 6 :
-                worldRank === 681 ? 7 : 8
-              );
-
-              const uniUrl = prog.uni_url || (
-                prog.inst.toLowerCase().includes("tu wien") ? "https://www.tuwien.at" :
-                prog.inst.toLowerCase().includes("vienna") ? "https://www.univie.ac.at" :
-                prog.inst.toLowerCase().includes("jku") ? "https://www.jku.at" :
-                prog.inst.toLowerCase().includes("tu graz") ? "https://www.tugraz.at" :
-                prog.inst.toLowerCase().includes("innsbruck") ? "https://www.uibk.ac.at" :
-                prog.inst.toLowerCase().includes("hagenberg") ? "https://www.fh-ooe.at/campus-hagenberg/" : "https://www.studienwahl.at"
-              );
-
-              return (
-                <motion.div
-                  key={`${prog.title}-${prog.inst}`}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25, delay: Math.min(idx * 0.02, 0.25) }}
-                  className="group bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 hover:shadow-2xl hover:shadow-[#7ec8a7]/5 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full"
-                >
-                  {/* Card Content */}
-                  <div className="p-5 sm:p-6 flex-1 flex flex-col">
-                    {/* Header Row: Status, World Rank, and Field */}
-                    <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${
-                        prog.status === "open"
-                          ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                          : prog.status === "soon"
-                          ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
-                          : "bg-rose-500/10 border-rose-500/25 text-rose-300"
-                      }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${prog.status === "open" ? "bg-emerald-400 animate-pulse" : prog.status === "soon" ? "bg-amber-400" : "bg-rose-400"}`} />
-                        <span className="truncate max-w-[160px]">{prog.statusLabel || (prog.status === "open" ? "Open Now" : "Closed")}</span>
-                      </span>
-
-                      {/* World Ranking Badge */}
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                        <Trophy className="w-3 h-3 text-amber-400" />
-                        QS #{worldRank} · #{countryRank} in {country}
-                      </span>
-
-                      {/* Field Tag */}
-                      <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-teal-500/10 text-[#7ec8a7] border border-teal-500/20">
-                        {prog.field}
-                      </span>
-                    </div>
-
-                    {/* Program Title */}
-                    <h2 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug group-hover:text-[#7ec8a7] transition-colors">
-                      {prog.title}
-                    </h2>
-
-                    {/* Institution & Geographical Location */}
-                    <div className="flex flex-wrap items-center gap-2 text-slate-400 text-xs sm:text-sm font-medium mb-3">
-                      <div className="flex items-center gap-1.5 text-slate-300">
-                        <Building2 className="w-3.5 h-3.5 text-[#7ec8a7] shrink-0" />
-                        <span className="truncate font-semibold">{prog.inst}</span>
-                      </div>
-                      <a
-                        href={uniUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[11px] text-teal-400 hover:underline flex items-center gap-0.5 shrink-0"
-                        title="Visit Official University Portal"
-                      >
-                        Official Site <ExternalLink className="w-2.5 h-2.5" />
-                      </a>
-                    </div>
-
-                    {/* City & Country Tag */}
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg bg-[#18211f] text-slate-300 border border-[#2d3a36]">
-                        <MapPin className="w-3 h-3 text-blue-400 shrink-0" />
-                        {city}, {country === "Germany" ? "🇩🇪 Germany" : "🇦🇹 Austria"}
-                      </span>
-                      <span className="text-xs px-2 py-0.5 rounded bg-[#18211f] text-slate-400 border border-[#2d3a36]">
-                        {prog.lang || "English"}
-                      </span>
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-slate-400 text-xs sm:text-sm mb-4 line-clamp-3 leading-relaxed">
-                      {prog.desc}
-                    </p>
-
-                    {/* Deadlines & Tuition 2x2 Info Grid (ZERO OVERLAP) */}
-                    <div className="bg-[#080d0c] rounded-xl border border-[#232f2b] p-3.5 space-y-3 mb-4">
-                      {/* Deadlines */}
-                      <div>
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlines</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Students</span>
-                            <span className="text-slate-200 font-medium break-words leading-tight block">
-                              {prog.deadlineEU || "See official site"}
-                            </span>
-                          </div>
-                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Students</span>
-                            <span className="text-slate-200 font-medium break-words leading-tight block">
-                              {prog.deadlineNonEU || "See official site"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Tuition Fees */}
-                      <div className="pt-2.5 border-t border-[#232f2b]">
-                        <div className="flex items-center gap-1.5 mb-2">
-                          <Banknote className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tuition Fees</span>
-                        </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Tuition</span>
-                            <span className="text-slate-200 font-medium break-words leading-tight block">
-                              {prog.feeEU || "Free / ÖH fee only"}
-                            </span>
-                          </div>
-                          <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Tuition</span>
-                            <span className="text-slate-200 font-medium break-words leading-tight block">
-                              {prog.feeNonEU || "Standard rate"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Tags */}
-                    {prog.tags && prog.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {prog.tags.map((t) => (
-                          <span
-                            key={t}
-                            className="px-2 py-0.5 bg-[#18211f] border border-[#2d3a36] text-slate-300 text-[11px] font-medium rounded-md"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="p-3.5 sm:p-4 bg-[#080d0c] border-t border-[#232f2b] grid grid-cols-2 gap-3 mt-auto">
-                    <a
-                      href={prog.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#18211f] hover:bg-[#273430] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#2d3a36] active:scale-95"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-                      <span>Details</span>
-                    </a>
-                    <a
-                      href={prog.applyUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 ${
-                        prog.status === "open"
-                          ? "bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] border-[#7ec8a7] shadow-md shadow-[#7ec8a7]/20 font-bold"
-                          : "bg-[#18211f] hover:bg-[#273430] text-slate-400 border-[#2d3a36] cursor-not-allowed"
-                      }`}
-                      onClick={(e) => {
-                        if (prog.status !== "open") e.preventDefault();
-                      }}
-                    >
-                      <GraduationCap className="w-4 h-4 shrink-0" />
-                      <span>Apply Now</span>
-                    </a>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
-      )}
-
-      {/* TAB 2: UNIVERSITIES DIRECTORY */}
-      {activeTab === "universities" && (
-        <div className="space-y-10">
-          {Object.entries(universitiesByCountry).map(([countryName, uList]) => (
-            <div key={countryName} className="space-y-4">
-              <div className="flex items-center gap-3 border-b border-[#232f2b] pb-3">
-                <span className="text-2xl">{countryName === "Austria" ? "🇦🇹" : countryName === "Germany" ? "🇩🇪" : "🇨🇭"}</span>
-                <h2 className="text-2xl font-bold text-white">{countryName} Universities</h2>
-                <span className="text-xs px-2.5 py-1 rounded-full bg-[#7ec8a7]/10 text-[#7ec8a7] border border-[#7ec8a7]/30 font-semibold ml-auto">
-                  {uList.length} Institutions
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {uList.map((uni) => (
-                  <div
-                    key={uni.name}
-                    className="bg-[#0e1413] border border-[#232f2b] hover:border-[#7ec8a7]/60 rounded-2xl p-5 flex flex-col justify-between transition-all hover:shadow-xl shadow-black/40"
-                  >
-                    <div>
-                      {/* Top Rank Badge */}
-                      <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 text-xs font-bold">
-                          <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                          QS World #{uni.rank_world}
-                        </span>
-                        <span className="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-300 border border-blue-500/30 font-semibold">
-                          #{uni.rank_country} in {uni.country}
-                        </span>
-                      </div>
-
-                      {/* University Title & City */}
-                      <h3 className="text-lg font-bold text-white mb-1.5 leading-snug">
-                        {uni.name}
-                      </h3>
-                      <div className="flex items-center gap-2 text-xs text-slate-400 font-medium mb-3">
-                        <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                        <span>{uni.city}, {uni.country}</span>
-                        <span className="text-slate-600">•</span>
-                        <span className="text-slate-400">{uni.type}</span>
-                      </div>
-
-                      <p className="text-slate-400 text-xs leading-relaxed mb-4 line-clamp-3">
-                        {uni.description}
-                      </p>
-                    </div>
-
-                    {/* Footer Actions */}
-                    <div className="pt-4 border-t border-[#232f2b] flex items-center justify-between gap-3">
-                      <a
-                        href={uni.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center gap-1.5 text-xs font-semibold text-teal-400 hover:text-teal-300 transition-colors"
-                      >
-                        <Globe className="w-3.5 h-3.5" />
-                        Official Site <ExternalLink className="w-3 h-3" />
-                      </a>
-
-                      <button
-                        onClick={() => {
-                          setSearchTerm(uni.short_name);
-                          setActiveTab("programs");
-                        }}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#18211f] hover:bg-[#7ec8a7] hover:text-[#0f1a16] text-slate-200 text-xs font-semibold border border-[#2d3a36] transition-all"
-                      >
-                        <GraduationCap className="w-3.5 h-3.5" />
-                        View Programs
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {filteredPrograms.length === 0 && activeTab === "programs" && (
-        <div className="text-center py-20 text-slate-500 bg-[#0e1413]/60 border border-[#232f2b] rounded-3xl mt-6 p-8">
-          <ShieldAlert className="w-12 h-12 mx-auto mb-3 text-slate-600" />
-          <h3 className="text-lg font-semibold text-slate-300 mb-1">No Programs Found</h3>
-          <p className="text-sm max-w-md mx-auto mb-4">
-            No degrees matched your customized search filters. Try clearing some selections.
-          </p>
-          <button
-            onClick={resetFilters}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7ec8a7] text-[#0f1a16] text-xs font-bold hover:bg-teal-400 transition-all shadow-md"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            Reset All Filters
-          </button>
-        </div>
-      )}
     </div>
   );
 }
