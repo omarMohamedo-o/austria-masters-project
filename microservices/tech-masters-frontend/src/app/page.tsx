@@ -1,45 +1,29 @@
-import ProgramList from "@/components/ProgramList";
-
-// Define the expected Program type (same as in ProgramList)
-type Program = {
-  title: string;
-  inst: string;
-  field: string;
-  status: string;
-  statusLabel: string;
-  sortDate: string;
-  dateLabel: string;
-  deadlineEU: string;
-  deadlineNonEU: string;
-  windowLabel: string;
-  desc: string;
-  tags: string[];
-  lang: string;
-  url: string;
-  applyUrl: string;
-  feeEU: string;
-  feeEUNote: string;
-  feeNonEU: string;
-  feeApp: string;
-  feeFree: boolean;
-};
+import ProgramList, { Program, University } from "@/components/ProgramList";
 
 export default async function Home() {
-  // Fetch from the backend API microservice
-  // Next.js will automatically cache this for Vercel deployments (SSG behavior)
+  const apiUrl = process.env.API_URL || "http://localhost:8000";
   let programs: Program[] = [];
+  let universities: University[] = [];
+
   try {
-    const res = await fetch(process.env.API_URL || 'http://localhost:8000/api/programs');
-    if (res.ok) {
-      programs = await res.json();
+    const [progRes, uniRes] = await Promise.allSettled([
+      fetch(`${apiUrl}/api/programs`),
+      fetch(`${apiUrl}/api/universities`)
+    ]);
+
+    if (progRes.status === "fulfilled" && progRes.value.ok) {
+      programs = await progRes.value.json();
+    }
+    if (uniRes.status === "fulfilled" && uniRes.value.ok) {
+      universities = await uniRes.value.json();
     }
   } catch (error) {
-    console.error("Failed to fetch programs from backend:", error);
+    console.error("Failed to fetch data from backend:", error);
   }
 
   return (
-    <main className="min-h-screen bg-black selection:bg-blue-500/30">
-      <ProgramList initialPrograms={programs} />
+    <main className="min-h-screen bg-[#0d1117] text-slate-100 selection:bg-teal-500/30">
+      <ProgramList initialPrograms={programs} initialUniversities={universities} />
     </main>
   );
 }
