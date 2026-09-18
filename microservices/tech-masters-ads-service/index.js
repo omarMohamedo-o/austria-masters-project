@@ -7,7 +7,7 @@ app.use(cors());
 app.use(express.json());
 
 // Rich inventory of relevant educational and technology sponsors
-const adInventory = [
+let adInventory = [
   {
     id: 'ad_scholarship_oead',
     type: 'banner',
@@ -114,6 +114,48 @@ app.get('/api/ads/analytics', (req, res) => {
     ctr,
     activeCampaigns: adInventory.length
   });
+});
+
+// Admin: Create new ad campaign
+app.post('/api/ads', (req, res) => {
+  const newAd = {
+    id: req.body.id || `ad_${Date.now()}`,
+    type: req.body.type || (req.body.slot === 'top_banner' ? 'banner' : 'card'),
+    slot: req.body.slot || 'in_feed',
+    client: req.body.client || 'Partner Sponsor',
+    title: req.body.title || 'Sponsored Tech Program',
+    tagline: req.body.tagline || 'Special Offer for Tech Students',
+    description: req.body.description || 'Exclusive opportunities and fellowships.',
+    cta: req.body.cta || 'Learn More',
+    url: req.body.url || 'https://grants.at/en/',
+    cpc: parseFloat(req.body.cpc) || 0.75,
+    badge: req.body.badge || 'Sponsored',
+    active: req.body.active !== undefined ? req.body.active : true
+  };
+  adInventory.push(newAd);
+  res.status(201).json({ status: 'created', ad: newAd });
+});
+
+// Admin: Update ad campaign
+app.put('/api/ads/:id', (req, res) => {
+  const { id } = req.params;
+  const index = adInventory.findIndex(a => a.id === id);
+  if (index !== -1) {
+    adInventory[index] = { ...adInventory[index], ...req.body };
+    return res.json({ status: 'updated', ad: adInventory[index] });
+  }
+  res.status(404).json({ error: 'Ad campaign not found' });
+});
+
+// Admin: Delete ad campaign
+app.delete('/api/ads/:id', (req, res) => {
+  const { id } = req.params;
+  const initialLen = adInventory.length;
+  adInventory = adInventory.filter(a => a.id !== id);
+  if (adInventory.length === initialLen) {
+    return res.status(404).json({ error: 'Ad campaign not found' });
+  }
+  res.json({ status: 'deleted', id });
 });
 
 const PORT = process.env.PORT || 4000;

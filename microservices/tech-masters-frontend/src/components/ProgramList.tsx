@@ -391,18 +391,24 @@ export default function ProgramList({
     }
   };
 
-  // Extract cities
-  const availableCities = [
-    "Vienna",
-    "Linz",
-    "Graz",
-    "Salzburg",
-    "Innsbruck",
-    "Hagenberg",
-    "St. Pölten",
-    "Villach",
-    "Eisenstadt"
-  ];
+  // Complete cities directory for Austria & Germany
+  const citiesByCountry: Record<string, string[]> = {
+    Austria: [
+      "Vienna", "Graz", "Linz", "Salzburg", "Innsbruck", "Klagenfurt", 
+      "Villach", "Hagenberg", "St. Pölten", "Eisenstadt", "Leoben", 
+      "Dornbirn", "Krems", "Wiener Neustadt", "Kufstein"
+    ],
+    Germany: [
+      "Munich", "Berlin", "Aachen", "Karlsruhe", "Heidelberg", "Stuttgart", 
+      "Darmstadt", "Dresden", "Hamburg", "Frankfurt", "Cologne", "Leipzig"
+    ]
+  };
+
+  const availableCities = useMemo(() => {
+    if (filterCountry === "Austria") return citiesByCountry["Austria"];
+    if (filterCountry === "Germany") return citiesByCountry["Germany"];
+    return [...citiesByCountry["Austria"], ...citiesByCountry["Germany"]];
+  }, [filterCountry]);
 
   // Status options matching Screenshot 1 exactly
   const statusOptions = [
@@ -650,14 +656,30 @@ export default function ProgramList({
               {/* Live Monetization Microservice Active Badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
                 <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Ads Engine Online</span>
-                <span className="font-bold text-white ml-1">${adRevenue.toFixed(2)} earned</span>
+                <span>Ads Engine</span>
+                <span className="font-bold text-white ml-0.5">${adRevenue.toFixed(2)}</span>
                 {recentEarning && (
                   <span className="text-emerald-300 text-[10px] font-bold animate-bounce ml-0.5">
                     +${recentEarning.toFixed(2)}
                   </span>
                 )}
               </div>
+
+              {/* Kafka Data Streaming Live Badge */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span>Kafka Stream Live</span>
+              </div>
+
+              {/* Admin Portal Navigation Link */}
+              <a
+                href="/admin"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/15 hover:bg-purple-500/25 border border-purple-500/40 text-purple-300 text-xs font-semibold transition-all hover:scale-105 shadow-sm"
+                title="Open Admin Portal to Manage Programs, Ads & Kafka Streams"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
+                <span>Admin Portal</span>
+              </a>
             </div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-2 text-white">
