@@ -112,7 +112,7 @@ export default function CommunityPage() {
   const fetchPosts = async () => {
     setLoadingPosts(true);
     try {
-      const res = await fetch("http://localhost:8000/api/community/posts");
+      const res = await fetch("/api/community/posts");
       if (res.ok) {
         const data = await res.json();
         setPosts(data);
@@ -131,7 +131,7 @@ export default function CommunityPage() {
     );
 
     try {
-      await fetch(`http://localhost:8000/api/community/posts/${postId}/upvote`, {
+      await fetch(`/api/community/posts/${postId}/upvote`, {
         method: "POST"
       });
     } catch (e) {
@@ -166,7 +166,7 @@ export default function CommunityPage() {
     setCommentInputs((prev) => ({ ...prev, [postId]: "" }));
 
     try {
-      await fetch(`http://localhost:8000/api/community/posts/${postId}/comments`, {
+      await fetch(`/api/community/posts/${postId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -201,7 +201,7 @@ export default function CommunityPage() {
     };
 
     try {
-      const res = await fetch("http://localhost:8000/api/community/posts", {
+      const res = await fetch("/api/community/posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(postPayload)

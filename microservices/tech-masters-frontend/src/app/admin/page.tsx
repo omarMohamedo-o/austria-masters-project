@@ -191,7 +191,7 @@ export default function AdminPage() {
     setLoginError("");
 
     try {
-      const res = await fetch("http://localhost:8000/api/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -232,10 +232,10 @@ export default function AdminPage() {
     setLoading(true);
     try {
       const [progRes, adsRes, uniRes, kafkaRes] = await Promise.allSettled([
-        fetch("http://localhost:8000/api/programs"),
-        fetch("http://localhost:4000/api/ads"),
-        fetch("http://localhost:8000/api/universities"),
-        fetch("http://localhost:8000/api/kafka/status")
+        fetch("/api/programs"),
+        fetch("/api/ads"),
+        fetch("/api/universities"),
+        fetch("/api/kafka/status")
       ]);
 
       if (progRes.status === "fulfilled" && progRes.value.ok) {
@@ -269,7 +269,7 @@ export default function AdminPage() {
     try {
       if (editingProgram) {
         // Edit
-        const res = await fetch(`http://localhost:8000/api/programs/${editingProgram.id}`, {
+        const res = await fetch(`/api/programs/${editingProgram.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...editingProgram, ...programForm })
@@ -282,7 +282,7 @@ export default function AdminPage() {
         }
       } else {
         // Create
-        const res = await fetch("http://localhost:8000/api/programs", {
+        const res = await fetch("/api/programs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(programForm)
@@ -301,7 +301,7 @@ export default function AdminPage() {
   const handleDeleteProgram = async (id: string, title: string) => {
     if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
     try {
-      const res = await fetch(`http://localhost:8000/api/programs/${id}`, {
+      const res = await fetch(`/api/programs/${id}`, {
         method: "DELETE"
       });
       if (res.ok) {
@@ -317,7 +317,7 @@ export default function AdminPage() {
   const handleSaveAd = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:4000/api/ads", {
+      const res = await fetch("/api/ads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(adForm)
@@ -335,7 +335,7 @@ export default function AdminPage() {
   const handleDeleteAd = async (id: string, title: string) => {
     if (!confirm(`Delete campaign "${title}"?`)) return;
     try {
-      const res = await fetch(`http://localhost:4000/api/ads/${id}`, {
+      const res = await fetch(`/api/ads/${id}`, {
         method: "DELETE"
       });
       if (res.ok) {
@@ -352,7 +352,7 @@ export default function AdminPage() {
     e.preventDefault();
     setIsSavingPayout(true);
     try {
-      const res = await fetch("http://localhost:8000/api/admin/payout-settings", {
+      const res = await fetch("/api/admin/payout-settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payoutSettings)
@@ -370,7 +370,7 @@ export default function AdminPage() {
   // Trigger manual Kafka event
   const handleTriggerKafkaSync = async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/kafka/publish", {
+      const res = await fetch("/api/kafka/publish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

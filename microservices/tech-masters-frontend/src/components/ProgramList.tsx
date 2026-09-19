@@ -392,7 +392,7 @@ export default function ProgramList({
   // Handle Ad click and send analytics to port 4000
   const handleAdClick = async (adId: string) => {
     try {
-      const res = await fetch("http://localhost:4000/api/ads/click", {
+      const res = await fetch("/api/ads/click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ adId })
