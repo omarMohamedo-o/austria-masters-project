@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -337,6 +337,24 @@ export default function ProgramList({
   initialUniversities?: University[];
   initialAds?: { topBanner?: Ad; inFeedAds?: Ad[]; analytics?: any };
 }) {
+  // Programs State with Automatic Fallback
+  const [programs, setPrograms] = useState<Program[]>(initialPrograms || []);
+
+  useEffect(() => {
+    if (initialPrograms && initialPrograms.length > 0) {
+      setPrograms(initialPrograms);
+    } else {
+      fetch("/api/programs")
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data) && data.length > 0) {
+            setPrograms(data);
+          }
+        })
+        .catch((err) => console.error("Failed client-side programs fetch:", err));
+    }
+  }, [initialPrograms]);
+
   // Views
   const [activeTab, setActiveTab] = useState<"programs" | "universities">("programs");
 
@@ -522,7 +540,7 @@ export default function ProgramList({
 
   // Filter & Sort Programs
   const filteredPrograms = useMemo(() => {
-    let list = initialPrograms.filter((p) => {
+    let list = (programs || []).filter((p) => {
       const q = searchTerm.toLowerCase();
       const pCity = p.city || (p.inst.toLowerCase().includes("vienna") ? "Vienna" :
         p.inst.toLowerCase().includes("linz") ? "Linz" :
@@ -636,7 +654,7 @@ export default function ProgramList({
     });
 
     return list;
-  }, [initialPrograms, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, filterAppFee, feeType, maxTuition, sortBy]);
+  }, [programs, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, filterAppFee, feeType, maxTuition, sortBy]);
 
   // Universities grouped by country
   const universitiesByCountry = useMemo(() => {
@@ -784,7 +802,7 @@ export default function ProgramList({
         {/* Two-Column Layout: Left Sidebar for Search & Droplists, Right for Program Results */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT SIDEBAR: Search Settings (Droplists on the left) - Scrollable alone */}
-          <aside className="lg:col-span-4 xl:col-span-3.5 lg:sticky lg:top-20 z-20">
+          <aside className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 z-20">
             <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain custom-scrollbar pr-3">
               {/* Sidebar Header (Sticky inside sidebar) */}
               <div className="sticky top-0 bg-[#0e1413]/95 backdrop-blur-md z-10 -mt-2 pt-2 pb-3 border-b border-[#1f2c27] flex items-center justify-between">
@@ -1054,7 +1072,7 @@ export default function ProgramList({
           </aside>
 
           {/* RIGHT COLUMN: Results Header + Program Cards Grid */}
-          <main className="lg:col-span-8 xl:col-span-8.5 space-y-6">
+          <main className="lg:col-span-8 xl:col-span-9 space-y-6">
 
         {/* Screenshot 2 Exact Meta Bar */}
         <div className="flex flex-wrap items-center justify-between text-xs sm:text-sm text-slate-400 mb-8 px-2 py-1">
@@ -1063,7 +1081,7 @@ export default function ProgramList({
               As of <strong className="text-slate-200 font-bold">18 September 2026</strong>
             </span>
             <span>
-              <strong className="text-slate-200 font-bold">{initialPrograms.length}</strong> programmes tracked
+              <strong className="text-slate-200 font-bold">{programs.length}</strong> programmes tracked
             </span>
             {hasActiveFilters && (
               <span className="text-[#7ec8a7] font-semibold">
@@ -1081,9 +1099,8 @@ export default function ProgramList({
 
         {/* TAB 1: PROGRAMS GRID WITH IN-FEED SPONSORED CARDS */}
         {activeTab === "programs" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
-            <AnimatePresence>
-              {filteredPrograms.map((prog, idx) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-fr">
+            {filteredPrograms.map((prog, idx) => {
                 const city = prog.city || (prog.inst.toLowerCase().includes("vienna") ? "Vienna" :
                   prog.inst.toLowerCase().includes("linz") ? "Linz" :
                   prog.inst.toLowerCase().includes("graz") ? "Graz" :
@@ -1132,7 +1149,7 @@ export default function ProgramList({
                 const inFeedAd = adIndex >= 0 && inFeedAds[adIndex] ? inFeedAds[adIndex] : null;
 
                 return (
-                  <div key={`${prog.title}-${prog.inst}`} className="contents">
+                  <React.Fragment key={`${prog.title}-${prog.inst}`}>
                     {/* In-feed Sponsored Ad Card */}
                     {inFeedAd && (
                       <motion.div
@@ -1444,10 +1461,9 @@ export default function ProgramList({
                         </a>
                       </div>
                     </motion.div>
-                  </div>
+                  </React.Fragment>
                 );
               })}
-            </AnimatePresence>
           </div>
         )}
 

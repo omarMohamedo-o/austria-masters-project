@@ -1,4 +1,6 @@
 import ProgramList, { Program, University, Ad } from "@/components/ProgramList";
+import fs from "fs";
+import path from "path";
 
 export default async function Home() {
   const apiUrl = process.env.API_URL || "http://localhost:8000";
@@ -10,9 +12,9 @@ export default async function Home() {
 
   try {
     const [progRes, uniRes, adsRes] = await Promise.allSettled([
-      fetch(`${apiUrl}/api/programs`),
-      fetch(`${apiUrl}/api/universities`),
-      fetch(`${adsUrl}/api/ads`)
+      fetch(`${apiUrl}/api/programs`, { cache: "no-store" }),
+      fetch(`${apiUrl}/api/universities`, { cache: "no-store" }),
+      fetch(`${adsUrl}/api/ads`, { cache: "no-store" })
     ]);
 
     if (progRes.status === "fulfilled" && progRes.value.ok) {
@@ -26,6 +28,18 @@ export default async function Home() {
     }
   } catch (error) {
     console.error("Failed to fetch data from microservices:", error);
+  }
+
+  // Guaranteed fallback: If backend was not reached during SSR, read directly from data/programs.json
+  if (programs.length === 0) {
+    try {
+      const fallbackPath = path.resolve(process.cwd(), "../../data/programs.json");
+      if (fs.existsSync(fallbackPath)) {
+        programs = JSON.parse(fs.readFileSync(fallbackPath, "utf-8"));
+      }
+    } catch (e) {
+      console.error("Failed reading fallback programs:", e);
+    }
   }
 
   return (
