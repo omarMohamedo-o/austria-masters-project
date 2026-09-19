@@ -480,13 +480,14 @@ export default function ProgramList({
     setIsAutoRedirectActive(false);
   };
 
-  // Trigger immediate navigation to the official target link
+  // Trigger navigation to the official target link
   const handleProceedToGateway = () => {
     if (!gatewayModal) return;
     const url = gatewayModal.targetUrl;
     setGatewayModal(null);
     setIsAutoRedirectActive(false);
-    window.open(url, "_blank", "noopener,noreferrer");
+    // Direct redirect to the target URL (never blocked by browser popup blockers)
+    window.location.href = url;
   };
 
   // Auto-redirect countdown effect
@@ -1776,15 +1777,21 @@ export default function ProgramList({
                 >
                   Close & Return
                 </button>
-                <button
-                  onClick={handleProceedToGateway}
-                  className="py-2.5 px-4 rounded-xl bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] font-extrabold text-xs transition-all shadow-md shadow-[#7ec8a7]/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                <a
+                  href={gatewayModal.targetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setGatewayModal(null);
+                    setIsAutoRedirectActive(false);
+                  }}
+                  className="py-2.5 px-4 rounded-xl bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] font-extrabold text-xs transition-all shadow-md shadow-[#7ec8a7]/20 flex items-center justify-center gap-1.5 cursor-pointer text-center"
                 >
                   <span>
                     {gatewayModal.actionType === "apply" ? "Continue to Application Portal" : "Continue to Degree Details"}
                   </span>
                   <ExternalLink className="w-3.5 h-3.5" />
-                </button>
+                </a>
               </div>
             </div>
           </div>
