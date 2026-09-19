@@ -27,7 +27,10 @@ import {
   ChevronDown,
   ChevronUp,
   Award,
-  FileText
+  FileText,
+  FileCheck,
+  Calculator,
+  Sliders
 } from "lucide-react";
 
 export type Program = {
@@ -348,6 +351,23 @@ export default function ProgramList({
   const [filterRanking, setFilterRanking] = useState<string>("all");
   const [filterTuition, setFilterTuition] = useState<string>("all");
 
+  // Application Fee & Tuition Range Filters
+  const [filterAppFee, setFilterAppFee] = useState<"all" | "free" | "paid">("all");
+  const [feeType, setFeeType] = useState<"nonEu" | "eu">("nonEu");
+  const [maxTuition, setMaxTuition] = useState<number>(3000); // 3000 = Any Fee
+
+  const parseFeeNumber = (feeStr: string | undefined): number => {
+    if (!feeStr) return 0;
+    const lower = feeStr.toLowerCase();
+    if (lower.includes("free") && !lower.includes("€")) return 0;
+    const match = lower.match(/(?:€|eur)?\s*([0-9]+(?:[,.][0-9]+)?)/);
+    if (match) {
+      const clean = match[1].replace(",", "");
+      return parseFloat(clean) || 0;
+    }
+    return 0;
+  };
+
   // Search & Sorting
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortBy, setSortBy] = useState<"rank_world" | "rank_country" | "deadline" | "tuition" | "name">("rank_world");
@@ -564,7 +584,24 @@ export default function ProgramList({
       if (filterTuition === "free") matchesTuition = feeEu.includes("free") || p.feeFree === true;
       else if (filterTuition === "standard_eu") matchesTuition = feeEu.includes("363");
 
-      return matchesSearch && matchesStatus && matchesField && matchesLang && matchesCountry && matchesCity && matchesRank && matchesTuition;
+      // Application Fee filter
+      let matchesAppFee = true;
+      const fApp = (p.feeApp || "").toLowerCase();
+      if (filterAppFee === "free") {
+        matchesAppFee = fApp.includes("none") || fApp.includes("free") || fApp.includes("€0") || !p.feeApp;
+      } else if (filterAppFee === "paid") {
+        matchesAppFee = (fApp.includes("assist") || fApp.match(/[1-9]/) !== null) && !fApp.includes("€0") && !fApp.includes("none");
+      }
+
+      // Tuition Range Slider filter
+      let matchesTuitionRange = true;
+      if (maxTuition < 3000) {
+        const feeStr = feeType === "nonEu" ? p.feeNonEU : p.feeEU;
+        const val = parseFeeNumber(feeStr);
+        matchesTuitionRange = val <= maxTuition;
+      }
+
+      return matchesSearch && matchesStatus && matchesField && matchesLang && matchesCountry && matchesCity && matchesRank && matchesTuition && matchesAppFee && matchesTuitionRange;
     });
 
     // Sorting
@@ -590,7 +627,7 @@ export default function ProgramList({
     });
 
     return list;
-  }, [initialPrograms, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, sortBy]);
+  }, [initialPrograms, searchTerm, filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, filterAppFee, feeType, maxTuition, sortBy]);
 
   // Universities grouped by country
   const universitiesByCountry = useMemo(() => {
@@ -653,17 +690,35 @@ export default function ProgramList({
                 Global Tech Masters Portal
               </div>
 
-              {/* Live Monetization Microservice Active Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Ads Engine</span>
-                <span className="font-bold text-white ml-0.5">${adRevenue.toFixed(2)}</span>
-                {recentEarning && (
-                  <span className="text-emerald-300 text-[10px] font-bold animate-bounce ml-0.5">
-                    +${recentEarning.toFixed(2)}
-                  </span>
-                )}
-              </div>
+              {/* Community Knowledge Hub */}
+              <a
+                href="/community"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 text-xs font-semibold transition-all hover:scale-105 shadow-sm"
+                title="Student Community Discussions, Admission Q&A & Reviews"
+              >
+                <Users className="w-3.5 h-3.5 text-sky-400" />
+                <span>Community Q&A</span>
+              </a>
+
+              {/* Requirements & Visa Guide */}
+              <a
+                href="/community#requirements"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-all hover:scale-105 shadow-sm"
+                title="Master Requirements Checklist (Banking, Sperrkonto, Passport, Apostille, Police Record)"
+              >
+                <FileCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Requirements Checklist</span>
+              </a>
+
+              {/* Bavarian Grade Converter */}
+              <a
+                href="/community#grading"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 text-xs font-semibold transition-all hover:scale-105 shadow-sm"
+                title="Interactive Bavarian Formula Grade Converter"
+              >
+                <Calculator className="w-3.5 h-3.5 text-amber-400" />
+                <span>Grade Converter</span>
+              </a>
 
               {/* Kafka Data Streaming Live Badge */}
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-semibold">
@@ -883,7 +938,7 @@ export default function ProgramList({
             <div>
               <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
                 <Banknote className="w-3.5 h-3.5 text-emerald-400" />
-                Tuition Cost
+                Tuition Tier
               </span>
               <div className="flex flex-wrap items-center gap-2">
                 {tuitionOptions.map((opt) => {
@@ -903,6 +958,111 @@ export default function ProgramList({
                   );
                 })}
               </div>
+            </div>
+          </div>
+
+          {/* Row: Application Fee Filter */}
+          <div className="pt-2 border-t border-[#1f2c27]">
+            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-cyan-400" />
+              Application Fee
+            </span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              {[
+                { label: "All Application Fees", value: "all" },
+                { label: "Free Application (€0 / No Fee)", value: "free" },
+                { label: "Has Application Fee (uni-assist)", value: "paid" }
+              ].map((opt) => {
+                const active = filterAppFee === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setFilterAppFee(opt.value as any)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                      active
+                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
+                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row: Interactive Tuition Fee Range Slider Bar */}
+          <div className="p-4 rounded-2xl bg-[#121b18] border border-[#22312b]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-[#7ec8a7]" />
+                <span className="text-white font-semibold text-sm">Tuition Fee Range Slider</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-[#7ec8a7]/15 border border-[#7ec8a7]/30 text-[#7ec8a7] text-xs font-bold font-mono">
+                  {maxTuition >= 3000 ? "Any Fee (€0 - €5,000+)" : `Max €${maxTuition} / semester`}
+                </span>
+              </div>
+
+              {/* EU vs Non-EU Tuition Toggle */}
+              <div className="flex items-center bg-[#172320] p-1 rounded-xl border border-[#2a3c35]">
+                <button
+                  onClick={() => setFeeType("nonEu")}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    feeType === "nonEu"
+                      ? "bg-[#7ec8a7] text-[#0d1613] shadow font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  Non-EU / International Fee
+                </button>
+                <button
+                  onClick={() => setFeeType("eu")}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                    feeType === "eu"
+                      ? "bg-[#7ec8a7] text-[#0d1613] shadow font-bold"
+                      : "text-slate-400 hover:text-white"
+                  }`}
+                >
+                  EU / EEA Fee
+                </button>
+              </div>
+            </div>
+
+            {/* Slider bar */}
+            <div className="flex items-center gap-4">
+              <span className="text-xs text-slate-400 font-mono">€0</span>
+              <input
+                type="range"
+                min={0}
+                max={3000}
+                step={100}
+                value={maxTuition}
+                onChange={(e) => setMaxTuition(parseInt(e.target.value))}
+                className="w-full h-2 bg-[#202f2a] rounded-lg appearance-none cursor-pointer accent-[#7ec8a7]"
+              />
+              <span className="text-xs text-slate-400 font-mono">€3,000+</span>
+            </div>
+
+            {/* Quick Range Presets */}
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-[#1d2a25]">
+              <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold mr-1">Quick Presets:</span>
+              {[
+                { label: "Free (€0 / ÖH Only)", val: 50 },
+                { label: "Standard Public (≤ €750/sem)", val: 750 },
+                { label: "Moderate (≤ €1,500/sem)", val: 1500 },
+                { label: "Any Fee", val: 3000 }
+              ].map((preset) => (
+                <button
+                  key={preset.val}
+                  onClick={() => setMaxTuition(preset.val)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                    maxTuition === preset.val
+                      ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold"
+                      : "bg-[#182420] text-slate-300 border border-[#273832] hover:border-slate-500"
+                  }`}
+                >
+                  {preset.label}
+                </button>
+              ))}
             </div>
           </div>
 

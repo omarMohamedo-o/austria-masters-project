@@ -1,0 +1,295 @@
+{
+  "last_updated": "2026-09-19",
+  "official_sources": [
+    {
+      "name": "Austrian Federal Government (Migration.gv.at)",
+      "url": "https://www.migration.gv.at",
+      "type": "Official Government Portal",
+      "description": "Official legal portal for Austrian Student Residence Permits (Aufenthaltsbewilligung Student), 20 hrs/week student employment permissions, and the 12-month post-study Rot-Weiß-Rot (Red-White-Red) Karte job-seeker visa."
+    },
+    {
+      "name": "OeAD - Austrian Agency for International Mobility",
+      "url": "https://oead.at/en/to-austria/entry-and-residence",
+      "type": "Official Austrian Mobility Agency",
+      "description": "Official national guidance for visa entry, country-specific document legalization paths (Apostille vs Superlegalization), accredited student housing, and national scholarship portal (grants.at)."
+    },
+    {
+      "name": "German Federal Foreign Office (Auswärtiges Amt)",
+      "url": "https://www.auswaertiges-amt.de/en/visa-service/buergerservice/faq",
+      "type": "Official German Government Ministry",
+      "description": "Official federal portal for German national student visas (Visum zu Studienzwecken), blocked account (Sperrkonto) statutory minimums (€11,904/year), and health insurance compliance."
+    },
+    {
+      "name": "DAAD - German Academic Exchange Service",
+      "url": "https://www.daad.de/en/study-and-research-in-germany/plan-your-studies/requirements/",
+      "type": "Official German Academic Authority",
+      "description": "Comprehensive admission database for German universities, official credential recognition standards (Anabin), and language certificate requirements."
+    },
+    {
+      "name": "Uni-assist e.V.",
+      "url": "https://www.uni-assist.de/en/",
+      "type": "Official Credential Evaluation Center",
+      "description": "Official pre-evaluation service used by over 180 German universities for international Bachelor degree equivalency checks, preliminary documentation (VPD), and German grade conversion."
+    }
+  ],
+  "countries": {
+    "Austria": {
+      "country_code": "AT",
+      "flag": "🇦🇹",
+      "currency": "EUR (€)",
+      "financial_proof": {
+        "title": "Proof of Sufficient Financial Means (Unterhaltsnachweis)",
+        "monthly_requirement_under_24": 672.64,
+        "monthly_requirement_24_and_older": 1217.96,
+        "annual_amount_for_12_months_over_24": 14615.52,
+        "accepted_methods": [
+          {
+            "method": "Personal Bank Account in Student's Name",
+            "details": "Checking or savings account in applicant's name with immediate access in Austria or international account (convertible to EUR) showing full 12-month funds. Must provide proof of legal origin of funds (parents' salary slips, tax returns, sale of assets, or savings record)."
+          },
+          {
+            "method": "Declaration of Liability (Haftungserklärung)",
+            "details": "A notarized Austrian liability declaration signed by an Austrian resident sponsor or EU guarantor, covering all living and accommodation costs, verified by Austrian immigration authorities."
+          },
+          {
+            "method": "Official Austrian or International Scholarship (e.g., OeAD, Ernst Mach Grant)",
+            "details": "Official scholarship award letter from an accredited foundation (OeAD, Erasmus Mundus, Austrian government) proving monthly living stipend."
+          }
+        ],
+        "official_link": "https://www.migration.gv.at/en/living-and-working-in-austria/staying-permanently-in-austria/students/"
+      },
+      "visa_and_permit": {
+        "permit_name": "Student Residence Permit (Aufenthaltsbewilligung - Student)",
+        "application_location": "Austrian Embassy/Consulate in home country (for visa-required nationals) or directly at the local Immigration Authority (Magistrat MA 35 in Vienna, Bezirkshauptmannschaft in other federal states) within visa-free 90 days for visa-exempt nationals.",
+        "application_fee": "€160 total (€120 at application submission, €20 at grant of permit, €20 personalization fee).",
+        "processing_time": "Normally 60 to 90 days from complete document submission."
+      },
+      "work_rights": {
+        "working_hours": "Up to 20 hours per week during ongoing semesters (unrestricted during semester holidays).",
+        "post_study_visa": "Rot-Weiß-Rot Karte (Red-White-Red Card) for Graduates: 12-month job seeker residence permit granted immediately upon Master graduation with no labor market test (Ersatzkraftverfahren) required once an adequate skilled job offer with minimum statutory gross salary is secured."
+      },
+      "health_insurance": {
+        "provider": "ÖGK (Österreichische Gesundheitskasse) Student Insurance",
+        "monthly_cost": "€69.13 / month",
+        "coverage": "Comprehensive universal health coverage across all Austrian public doctors, clinics, and university hospitals.",
+        "visa_entry_requirement": "For entering Austria to pick up your residence permit, an incoming travel health insurance covering at least €30,000 (e.g., Mawista, Care Concept, or Allianz) is required until ÖGK registration is activated."
+      }
+    },
+    "Germany": {
+      "country_code": "DE",
+      "flag": "🇩🇪",
+      "currency": "EUR (€)",
+      "financial_proof": {
+        "title": "German Blocked Account (Sperrkonto)",
+        "statutory_annual_amount": 11904.00,
+        "statutory_monthly_disbursement": 992.00,
+        "official_approved_providers": [
+          { "name": "Expatrio", "url": "https://www.expatrio.com", "badge": "Federal Foreign Office Approved" },
+          { "name": "Fintiba", "url": "https://www.fintiba.com", "badge": "Federal Foreign Office Approved" },
+          { "name": "Coracle", "url": "https://www.coracle.de", "badge": "Federal Foreign Office Approved" }
+        ],
+        "accepted_alternatives": [
+          "Formal Obligation (Verpflichtungserklärung pursuant to §§ 66-68 AufenthG) issued by an alien authority in Germany.",
+          "Recognized scholarship from public funds (e.g. DAAD, Alexander von Humboldt, Erasmus+)."
+        ],
+        "official_link": "https://www.auswaertiges-amt.de/en/visa-service/buergerservice/faq/02-sperrkonto"
+      },
+      "visa_and_permit": {
+        "permit_name": "National Visa for Study Purposes (Visum zu Studienzwecken, Category D)",
+        "application_location": "German Embassy or Visa Application Center (VFS Global / TLScontact) in student's country of residence.",
+        "application_fee": "€75 national visa fee.",
+        "processing_time": "Normally 4 to 12 weeks depending on embassy appointment backlogs."
+      },
+      "work_rights": {
+        "working_hours": "140 full days or 280 half days per calendar year (approximately 20 hours per week during term time).",
+        "post_study_visa": "18-month Job Seeker Residence Permit (Aufenthaltserlaubnis zur Arbeitsplatzsuche nach § 20 Abs. 3 Nr. 1 AufenthG) upon graduating with a German Master's degree, leading directly to the EU Blue Card (Blaue Karte EU)."
+      },
+      "health_insurance": {
+        "provider": "Statutory Public Health Insurance (Gesetzliche Krankenversicherung - GKV)",
+        "providers_list": ["TK (Techniker Krankenkasse)", "AOK", "Barmer", "DAK-Gesundheit"],
+        "monthly_cost": "Approx. €125 - €130 / month (discounted student tariff up to age 30).",
+        "coverage": "Full medical, dental, hospitalization, and prescription coverage without deductible."
+      }
+    }
+  },
+  "checklist_items": [
+    {
+      "id": "req_passport",
+      "category": "Identity & Civil Status",
+      "title": "Valid Biometric Passport",
+      "description": "Must be valid for at least 6 months beyond intended stay in Europe, contain at least 2 consecutive blank pages, and have been issued within the last 10 years.",
+      "authority": "ICAO Doc 9303 / Schengen Border Code",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_photos",
+      "category": "Identity & Civil Status",
+      "title": "Biometric Passport Photographs (35x45mm)",
+      "description": "Recent (taken within the last 6 months), front-facing, neutral facial expression, plain light grey/white background, compliant with international ICAO biometric standards.",
+      "authority": "Federal Foreign Office / Austrian BMI",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_birth_cert",
+      "category": "Identity & Civil Status",
+      "title": "Official Birth Certificate with Legalization & Translation",
+      "description": "Full birth certificate stating parents' names. Must carry Hague Apostille OR Diplomatic Superlegalization by the Austrian/German embassy in country of issuance, accompanied by certified translation into German or English by a court-sworn translator.",
+      "authority": "Austrian BMI / German Auswärtiges Amt",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_bachelor_degree",
+      "category": "Academic Credentials",
+      "title": "Bachelor Degree Certificate (Diploma)",
+      "description": "Original degree parchment or provisional degree certificate indicating completion of a recognized Bachelor program (minimum 180 ECTS or 3-4 years). Must be properly legalized according to bilateral agreements.",
+      "authority": "ENIC-NARIC / Anabin Database",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_transcripts",
+      "category": "Academic Credentials",
+      "title": "Official Academic Transcripts of Records",
+      "description": "Complete semester-by-semester breakdown of all completed courses, examination grades, credit hours, and GPA, bearing university seal and registrar signature.",
+      "authority": "European Higher Education Area (EHEA)",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_module_handbook",
+      "category": "Academic Credentials",
+      "title": "Course Descriptions / Curriculum Module Catalog (Modulhandbuch)",
+      "description": "Official university syllabus detailing learning objectives, lecture/lab hours, and weekly topics covered in your Bachelor's degree. Essential for Austrian (UG 2002 § 64) and German equivalence checks in mathematics, algorithms, and theoretical computer science.",
+      "authority": "University Admission Committees",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_aps_certificate",
+      "category": "Academic Credentials",
+      "title": "APS Certificate (Akademische Prüfstelle)",
+      "description": "Mandatory authenticity certificate issued by the German Embassy APS bureau. Required for all applicants with Bachelor degrees from India, China, or Vietnam before applying to German universities or student visas.",
+      "authority": "APS India / APS China / APS Vietnam",
+      "required_for": ["Germany"]
+    },
+    {
+      "id": "req_english_cert",
+      "category": "Language Proficiency",
+      "title": "Certified English Language Test (IELTS / TOEFL / Cambridge)",
+      "description": "Official score report: IELTS Academic (overall 6.5–7.0, sub-bands 6.0+) or TOEFL iBT (88–100 points, minimum 20 per section). Medium of Instruction (MOI) certificates are accepted only for graduates of English-speaking native countries (UK, USA, CA, AU, NZ) or specific exempt universities.",
+      "authority": "IELTS.org / ETS.org / Cambridge English",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_financial_funds",
+      "category": "Financial & Banking",
+      "title": "Proof of Sufficient Funds (Sperrkonto / Bank Balance Proof)",
+      "description": "For Germany: Confirmed Blocked Account (Sperrkonto) with €11,904. For Austria: Bank statement showing full 12 months (€14,615 if 24+) in student's name with source of funds documentation, or notarized Austrian liability declaration (Haftungserklärung).",
+      "authority": "Austrian Migration.gv.at / German Auswärtiges Amt",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_pcc",
+      "category": "Civil & Legal Clearance",
+      "title": "Police Clearance Certificate (PCC / Strafregisterbescheinigung)",
+      "description": "Criminal record certificate issued by national police or Ministry of Interior of your country of citizenship and recent country of residence. Must be issued within the last 3 months, legalized with Apostille/Superlegalization, and sworn translated.",
+      "authority": "Austrian BMI & Austrian Embassies",
+      "required_for": ["Austria"]
+    },
+    {
+      "id": "req_health_insurance",
+      "category": "Health & Housing",
+      "title": "Comprehensive Health Insurance Coverage",
+      "description": "Proof of statutory or approved comprehensive health insurance coverage without exclusions. Austria: ÖGK student insurance (€69.13/mo) + travel incoming policy for visa entry. Germany: TK / AOK public health insurance (€125/mo).",
+      "authority": "ÖGK Austria / German GKV Spitzenverband",
+      "required_for": ["Austria", "Germany"]
+    },
+    {
+      "id": "req_accommodation",
+      "category": "Health & Housing",
+      "title": "Proof of Accommodation (Rental Contract / OeAD Housing)",
+      "description": "Formal tenancy agreement (Mietvertrag), student dormitory contract (OeAD-WohnraumverwaltungsGmbH in Austria, Studentenwerk in Germany), or landlord confirmation for at least the initial 3 to 6 months.",
+      "authority": "Austrian & German Immigration Authorities",
+      "required_for": ["Austria", "Germany"]
+    }
+  ],
+  "english_testing_standards": {
+    "ielts": {
+      "name": "IELTS Academic",
+      "official_url": "https://www.ielts.org",
+      "standard_requirement": "Overall 6.5 or 7.0 (with no sub-score below 6.0)",
+      "top_tier_requirement": "Overall 7.0 (Writing/Speaking min 6.5) for TUM, TU Wien, Uni Vienna",
+      "validity": "2 years from test date",
+      "acceptance": "Universally accepted at 100% of Austrian and German universities"
+    },
+    "toefl": {
+      "name": "TOEFL iBT",
+      "official_url": "https://www.ets.org/toefl",
+      "standard_requirement": "88 – 95 total points",
+      "top_tier_requirement": "100 total points (Listening: 22, Reading: 22, Speaking: 22, Writing: 24)",
+      "validity": "2 years from test date",
+      "acceptance": "Universally accepted. Note: 'Home Edition' is rejected by certain technical faculties."
+    },
+    "cambridge": {
+      "name": "Cambridge C1 Advanced (CAE) & C2 Proficiency (CPE)",
+      "official_url": "https://www.cambridgeenglish.org",
+      "standard_requirement": "Score 180+ (Grade C or higher)",
+      "top_tier_requirement": "Score 190+ (Grade B or higher / C2)",
+      "validity": "Accepted indefinitely or within 2-3 years depending on university regulation",
+      "acceptance": "Recognized across European universities"
+    },
+    "pte": {
+      "name": "PTE Academic (Pearson Test of English)",
+      "official_url": "https://www.pearsonpte.com",
+      "standard_requirement": "Overall 65 points (minimum 60 in all skills)",
+      "top_tier_requirement": "Overall 72 points",
+      "validity": "2 years from test date",
+      "acceptance": "Widely accepted at TU Graz, JKU Linz, and leading German universities"
+    },
+    "moi_rules": {
+      "title": "Medium of Instruction (MOI) Exemption Policy",
+      "rule_summary": "Most premier universities (TUM, TU Wien, Uni Vienna, RWTH Aachen) do NOT accept a simple MOI letter from non-native English-speaking countries. An MOI waiver is only granted if you completed your entire Bachelor's in a recognized native English-speaking country (Australia, Canada, Ireland, New Zealand, UK, USA)."
+    }
+  },
+  "grading_systems": {
+    "austrian_scale": [
+      { "grade": 1, "label": "Sehr gut", "english": "Excellent", "percentage": "90% - 100%", "description": "Outstanding performance with no major flaws." },
+      { "grade": 2, "label": "Gut", "english": "Good", "percentage": "80% - 89%", "description": "Generally sound performance with minor flaws." },
+      { "grade": 3, "label": "Befriedigend", "english": "Satisfactory", "percentage": "65% - 79%", "description": "Performance meets basic requirements." },
+      { "grade": 4, "label": "Genügend", "english": "Pass", "percentage": "50% - 64%", "description": "Minimum passing benchmark." },
+      { "grade": 5, "label": "Nicht genügend", "english": "Fail", "percentage": "< 50%", "description": "Substantial failure to meet criteria." }
+    ],
+    "german_scale": [
+      { "range": "1.0 - 1.5", "label": "Sehr gut", "english": "Excellent", "admission_competitiveness": "Extremely High (TUM, TU Wien priority shortlist)" },
+      { "range": "1.6 - 2.5", "label": "Gut", "english": "Good", "admission_competitiveness": "Competitive for standard Master admissions" },
+      { "range": "2.6 - 3.5", "label": "Befriedigend", "english": "Satisfactory", "admission_competitiveness": "May require additional aptitude interview or test" },
+      { "range": "3.6 - 4.0", "label": "Ausreichend", "english": "Pass", "admission_competitiveness": "Borderline / Minimum threshold for university matriculation" },
+      { "range": "> 4.0", "label": "Nicht ausreichend", "english": "Fail", "admission_competitiveness": "Ineligible for Master's admission" }
+    ],
+    "bavarian_formula": {
+      "name": "Modified Bavarian Formula (Modifizierte bayerische Formel)",
+      "legal_basis": "Resolution of the Standing Conference of the Ministers of Education and Cultural Affairs of the Länder (KMK) / Bavarian Higher Education Act",
+      "formula": "N = 1 + 3 * ((N_max - N_d) / (N_max - N_min))",
+      "variables": {
+        "N": "Calculated German/Austrian equivalent grade (1.0 = best, 4.0 = passing threshold)",
+        "N_max": "Maximum possible score/grade in your country's grading system",
+        "N_min": "Minimum passing score/grade required to graduate in your system",
+        "N_d": "Applicant's actual Bachelor degree score or GPA"
+      }
+    }
+  },
+  "course_descriptions_guide": {
+    "title": "How to Prepare Your Course Descriptions / Module Catalog (Modulhandbuch)",
+    "importance": "European university admissions boards (Austrian UG 2002 § 64 and German KMK guidelines) do NOT admit based on degree title alone. They perform a credit-by-credit equivalence audit against their specific Bachelor's curriculum.",
+    "core_subject_clusters": [
+      { "subject": "Higher Mathematics & Statistics", "typical_ects": "18 - 25 ECTS", "topics": "Calculus, Linear Algebra, Multivariable Calculus, Discrete Mathematics, Probability & Statistics" },
+      { "subject": "Theoretical Computer Science & Algorithms", "typical_ects": "15 - 20 ECTS", "topics": "Data Structures, Algorithm Analysis, Automata Theory, Formal Languages, Complexity (P vs NP)" },
+      { "subject": "Practical Computer Science & Systems", "typical_ects": "20 - 30 ECTS", "topics": "Object-Oriented Programming, Operating Systems, Computer Architecture, Computer Networks, Database Systems" },
+      { "subject": "Software Engineering & Project Work", "typical_ects": "10 - 15 ECTS", "topics": "Software Architecture, Agile Methods, Git, Testing & Quality Assurance, Team Capstone Project" }
+    ],
+    "preparation_checklist": [
+      "Obtain the official university-published Module Handbook or Course Catalog.",
+      "Ensure each course description specifies: course title, course code, weekly hours (lecture vs lab), total credit hours or ECTS equivalent.",
+      "List the syllabus breakdown: detailed weekly lecture topics, algorithmic methods taught, and mathematical proofs covered.",
+      "Include prescribed literature and textbooks (author, title, publisher).",
+      "Have the document officially certified: university stamp, seal, and signature of the Dean/Registrar, or provide an active official university URL pointing to the archived public curriculum."
+    ]
+  }
+}

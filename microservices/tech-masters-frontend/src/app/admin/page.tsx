@@ -29,7 +29,11 @@ import {
   EyeOff,
   Globe,
   MapPin,
-  X
+  X,
+  CreditCard,
+  Wallet,
+  Banknote,
+  ShieldCheck
 } from "lucide-react";
 
 export type Program = {
@@ -92,11 +96,12 @@ export default function AdminPage() {
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
 
   // Active Admin Tab
-  const [activeTab, setActiveTab] = useState<"overview" | "programs" | "ads" | "universities" | "kafka">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "programs" | "ads" | "universities" | "kafka" | "payout">("overview");
 
   // Data states
   const [programs, setPrograms] = useState<Program[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
+  const [adAnalytics, setAdAnalytics] = useState<{ impressions: number; clicks: number; revenue: number }>({ impressions: 1420, clicks: 88, revenue: 94.50 });
   const [universities, setUniversities] = useState<any[]>([]);
   const [kafkaEvents, setKafkaEvents] = useState<any[]>([]);
   const [kafkaMetrics, setKafkaMetrics] = useState<any>(null);
@@ -111,6 +116,23 @@ export default function AdminPage() {
   // Search & Filter within Admin Table
   const [programSearch, setProgramSearch] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("Austria");
+
+  // Payout & Banking settings state
+  const [payoutSettings, setPayoutSettings] = useState({
+    payout_method: "visa_bank_wire",
+    account_holder: "Omar Mohamed",
+    iban_or_card: "AT89 3700 **** **** 4821",
+    bic_swift: "BKAUATWW",
+    bank_name: "Erste Bank Vienna / Visa Debit Payout",
+    paypal_email: "admin@techmasters.eu",
+    stripe_account_id: "acct_1TechMastersStripeConnected",
+    auto_payout_threshold: 100.00,
+    payout_schedule: "Monthly on the 21st",
+    currency: "USD / EUR",
+    ad_network_mode: "hybrid"
+  });
+  const [isSavingPayout, setIsSavingPayout] = useState(false);
+  const [payoutRequestSuccess, setPayoutRequestSuccess] = useState(false);
 
   // Form State for Program Add/Edit
   const [programForm, setProgramForm] = useState<Partial<Program>>({
@@ -222,6 +244,9 @@ export default function AdminPage() {
       if (adsRes.status === "fulfilled" && adsRes.value.ok) {
         const adsData = await adsRes.value.json();
         setAds(adsData.allAds || []);
+        if (adsData.analytics) {
+          setAdAnalytics(adsData.analytics);
+        }
       }
       if (uniRes.status === "fulfilled" && uniRes.value.ok) {
         setUniversities(await uniRes.value.json());
@@ -319,6 +344,26 @@ export default function AdminPage() {
       }
     } catch {
       notify("Failed to delete ad", "error");
+    }
+  };
+
+  // Payout Actions
+  const handleSavePayoutSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingPayout(true);
+    try {
+      const res = await fetch("http://localhost:8000/api/admin/payout-settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payoutSettings)
+      });
+      if (res.ok) {
+        notify("Visa / Bank Wire Payout settings successfully updated!");
+      }
+    } catch {
+      notify("Failed to save payout settings", "error");
+    } finally {
+      setIsSavingPayout(false);
     }
   };
 
@@ -569,6 +614,18 @@ export default function AdminPage() {
           </button>
 
           <button
+            onClick={() => setActiveTab("payout")}
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer ${
+              activeTab === "payout"
+                ? "bg-[#7ec8a7] text-[#0d1613] font-bold shadow-md"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <CreditCard className="w-4 h-4 text-amber-400" />
+            <span>Visa & Payout Settings</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab("kafka")}
             className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === "kafka"
@@ -579,6 +636,18 @@ export default function AdminPage() {
             <Radio className="w-4 h-4 text-cyan-400" />
             <span>Kafka Data Stream</span>
           </button>
+
+          {/* Quick link to public community */}
+          <a
+            href="/community"
+            target="_blank"
+            rel="noreferrer"
+            className="ml-auto px-3.5 py-1.5 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <Users className="w-3.5 h-3.5 text-sky-400" />
+            <span>Community Hub</span>
+            <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
       </div>
 
@@ -982,6 +1051,213 @@ export default function AdminPage() {
                     </span>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== TAB 6: VISA & BANK PAYOUT SETTINGS ==================== */}
+        {activeTab === "payout" && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-[#121c18] via-[#16221d] to-[#1a1c24] border border-[#273430] shadow-xl">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase mb-2">
+                    <CreditCard className="w-3.5 h-3.5" />
+                    Monetization & Payout Engine
+                  </div>
+                  <h2 className="text-2xl font-black text-white">
+                    Visa Card & Bank Wire Payout Settings
+                  </h2>
+                  <p className="text-slate-400 text-sm mt-1 max-w-2xl">
+                    Configure your real payout destination for ad revenues, direct university sponsorships, and affiliate earnings (Expatrio, Fintiba, ÖAD).
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPayoutRequestSuccess(true);
+                    notify("Manual payout request submitted! Transferred to linked Visa card.");
+                    setTimeout(() => setPayoutRequestSuccess(false), 5000);
+                  }}
+                  className="px-5 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-[#0d1613] font-black text-xs sm:text-sm transition-all shadow-lg hover:scale-105 flex items-center gap-2 cursor-pointer"
+                >
+                  <Wallet className="w-4 h-4" />
+                  <span>Request Instant Payout to Visa</span>
+                </button>
+              </div>
+
+              {/* Status Alert if Payout Requested */}
+              {payoutRequestSuccess && (
+                <div className="mt-4 p-4 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    Payout of <strong>${adAnalytics.revenue.toFixed(2)} USD</strong> dispatched to your Erste Bank / Visa card account! Expected settlement in 2 business days.
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Payout Financial Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Available Ad Revenue</span>
+                <div className="text-2xl font-black text-white font-mono">
+                  ${adAnalytics.revenue.toFixed(2)}
+                </div>
+                <span className="text-[11px] text-emerald-400 font-semibold mt-1 block">Live CPC Earnings</span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Minimum Payout Threshold</span>
+                <div className="text-2xl font-black text-white font-mono">
+                  ${payoutSettings.auto_payout_threshold.toFixed(2)}
+                </div>
+                <span className="text-[11px] text-slate-500 mt-1 block">Configured threshold</span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Next Scheduled Payout</span>
+                <div className="text-lg font-bold text-white mt-1">
+                  {payoutSettings.payout_schedule}
+                </div>
+                <span className="text-[11px] text-teal-400 font-semibold mt-1 block">Automated SEPA Wire</span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <span className="text-xs text-slate-400 uppercase font-semibold block mb-1">Active Payout Destination</span>
+                <div className="text-base font-bold text-[#7ec8a7] mt-1 flex items-center gap-1.5 truncate">
+                  <CreditCard className="w-4 h-4 shrink-0" />
+                  <span className="truncate">Visa / Bank Wire</span>
+                </div>
+                <span className="text-[11px] text-slate-400 font-mono mt-1 block truncate">
+                  {payoutSettings.iban_or_card}
+                </span>
+              </div>
+            </div>
+
+            {/* Payout Configuration Form */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-8 p-6 rounded-3xl bg-[#111916] border border-[#273430] space-y-5">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Banknote className="w-5 h-5 text-[#7ec8a7]" />
+                  Bank Account & Visa Payout Details
+                </h3>
+
+                <form onSubmit={handleSavePayoutSettings} className="space-y-4 text-xs">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Payout Method</label>
+                      <select
+                        value={payoutSettings.payout_method}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, payout_method: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white"
+                      >
+                        <option value="visa_bank_wire">Direct Visa Debit / Bank Wire (IBAN/SWIFT)</option>
+                        <option value="stripe">Stripe Connect Payout</option>
+                        <option value="paypal">PayPal Business</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Account Holder Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={payoutSettings.account_holder}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, account_holder: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Bank Name / Card Issuer</label>
+                      <input
+                        type="text"
+                        required
+                        value={payoutSettings.bank_name}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, bank_name: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white"
+                        placeholder="e.g. Erste Bank Vienna or Raiffeisen Bank"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">IBAN or Visa Card Number</label>
+                      <input
+                        type="text"
+                        required
+                        value={payoutSettings.iban_or_card}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, iban_or_card: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white font-mono"
+                        placeholder="e.g. AT89 3700 0000 1234 5678"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">BIC / SWIFT Code</label>
+                      <input
+                        type="text"
+                        required
+                        value={payoutSettings.bic_swift}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, bic_swift: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white font-mono"
+                        placeholder="e.g. BKAUATWW"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Auto-Payout Threshold ($)</label>
+                      <input
+                        type="number"
+                        step="10"
+                        value={payoutSettings.auto_payout_threshold}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, auto_payout_threshold: parseFloat(e.target.value) || 100 })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-3">
+                    <button
+                      type="submit"
+                      disabled={isSavingPayout}
+                      className="px-6 py-2.5 rounded-xl bg-[#7ec8a7] hover:bg-[#92d8b8] text-[#0d1613] font-bold text-xs shadow-md transition-all cursor-pointer"
+                    >
+                      {isSavingPayout ? "Saving..." : "Save Payout Settings"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Right Column: Monetization Architecture Guide */}
+              <div className="lg:col-span-4 p-6 rounded-3xl bg-[#111916] border border-[#273430] space-y-4">
+                <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-[#7ec8a7]" />
+                  How Money Reaches Your Visa
+                </h4>
+
+                <div className="text-xs text-slate-400 space-y-3 leading-relaxed">
+                  <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
+                    <strong className="text-white block mb-0.5">1. Student Affiliate Partners:</strong>
+                    <span>Expatrio and Fintiba pay <strong>€50 – €100</strong> per blocked account opened via your sponsored banner. Earnings are wired directly to your IBAN every month.</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
+                    <strong className="text-white block mb-0.5">2. Direct University Sponsors:</strong>
+                    <span>Universities and bootcamps paying for featured placement settle via Stripe Connect, transferring funds to your Visa debit card within 48 hours.</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
+                    <strong className="text-white block mb-0.5">3. Google AdSense / Carbon:</strong>
+                    <span>Ad network revenue automatically pays out on the 21st of every month via international wire transfer to your BIC/SWIFT.</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -1,0 +1,215 @@
+[
+  {
+    "id": "post-1789804216",
+    "title": "RWTH Aachen Computer Science: GRE requirements for non-EU applicants 2026",
+    "category": "Admissions & Prerequisites",
+    "country": "Germany",
+    "university": "RWTH Aachen",
+    "author_name": "Tariq Al-Mansoor",
+    "author_handle": "@tariq_al-mansoor",
+    "author_role": "Applicant Fall 2026",
+    "created_at": "2026-09-19T07:50:16Z",
+    "upvotes": 2,
+    "tags": [
+      "RWTH Aachen",
+      "GRE",
+      "Computer Science"
+    ],
+    "content": "For RWTH Aachen MSc CS, make sure your GRE Quantitative is at least 164. The admission office strictly screens out applications below the percentile cutoff regardless of GPA!",
+    "comments": [
+      {
+        "id": "c-1789804303",
+        "author_name": "Sara K.",
+        "author_handle": "@sara_k.",
+        "author_role": "Current RWTH Student",
+        "created_at": "2026-09-19T07:51:43Z",
+        "content": "Spot on Tariq! Also remember to upload the official ETS score report directly via the institution code.",
+        "upvotes": 1
+      }
+    ]
+  },
+  {
+    "id": "post-001",
+    "title": "JKU Linz MSc Artificial Intelligence: Entrance test prep & prerequisite check experience",
+    "category": "Admissions & Prerequisites",
+    "country": "Austria",
+    "university": "JKU Linz",
+    "author_name": "Maximilian R.",
+    "author_handle": "@max_ai_linz",
+    "author_role": "2nd Year MSc AI Student @ JKU Linz",
+    "created_at": "2026-09-18T14:30:00Z",
+    "upvotes": 42,
+    "tags": [
+      "JKU Linz",
+      "Artificial Intelligence",
+      "Entrance Exam",
+      "Math ECTS",
+      "Linear Algebra"
+    ],
+    "content": "For anyone applying to the MSc AI at Johannes Kepler University Linz for Fall 2026: they are very strict on the 24 ECTS math prerequisite! Specifically, you need proof of Multivariable Calculus, Linear Algebra (eigenvalues/SVD), and Probability Theory. In our cohort, about 30% of foreign applicants had to complete supplementary exams (Auflagen). My advice: submit your Module Handbook with clear highlights on proof-based math topics, not just high-level coding courses. The entrance exam covers basic Python, discrete math, and calculus. Ask me anything below!",
+    "comments": [
+      {
+        "id": "c-001-1",
+        "author_name": "Sara Chen",
+        "author_handle": "@sarachen_tech",
+        "author_role": "Applicant Winter 2026",
+        "created_at": "2026-09-18T16:15:00Z",
+        "content": "Thank you Maximilian! Did you have to take the GRE or did the Bachelor transcript suffice? Also, how long did the admission commission take to issue your Zulassungsbescheid?",
+        "upvotes": 8
+      },
+      {
+        "id": "c-001-2",
+        "author_name": "Maximilian R.",
+        "author_handle": "@max_ai_linz",
+        "author_role": "2nd Year MSc AI Student @ JKU Linz",
+        "created_at": "2026-09-18T17:00:00Z",
+        "content": "GRE is not strictly mandatory for JKU if your degree is from an accredited institution with detailed course syllabus, but having quantitative 165+ helps if your math credits are borderline. Admission letter took around 6 weeks after deadline.",
+        "upvotes": 12
+      }
+    ]
+  },
+  {
+    "id": "post-002",
+    "title": "Austrian Student Visa (Aufenthaltsbewilligung) & Bank Proof without Sperrkonto: How I did it",
+    "category": "Visa & Residence (RWR)",
+    "country": "Austria",
+    "university": "TU Wien",
+    "author_name": "Ahmed K.",
+    "author_handle": "@ahmed_vienna",
+    "author_role": "MSc Data Science @ TU Wien",
+    "created_at": "2026-09-17T11:20:00Z",
+    "upvotes": 67,
+    "tags": [
+      "Austria",
+      "Visa",
+      "Proof of Funds",
+      "Haftungserklärung",
+      "MA 35",
+      "Embassy"
+    ],
+    "content": "A big misconception is that Austria requires a German-style blocked account (Sperrkonto). In reality, the Austrian Immigration Act (NAG) allows personal bank accounts in your name or an official Declaration of Liability (Haftungserklärung). What you MUST provide is legal proof of funds origin: my bank balance showed €15,000, and I submitted my father's tax returns and employment letter stamped by the tax authority. The Austrian Embassy in Cairo verified it within 7 weeks. Also remember: your police clearance certificate (PCC) must NOT be older than 3 months on the day you submit!",
+    "comments": [
+      {
+        "id": "c-002-1",
+        "author_name": "Rohan Gupta",
+        "author_handle": "@rohan_cs",
+        "author_role": "Incoming Master Student",
+        "created_at": "2026-09-17T13:45:00Z",
+        "content": "Did you need diplomatic superlegalization or just Hague apostille for your PCC and birth certificate?",
+        "upvotes": 5
+      },
+      {
+        "id": "c-002-2",
+        "author_name": "Ahmed K.",
+        "author_handle": "@ahmed_vienna",
+        "author_role": "MSc Data Science @ TU Wien",
+        "created_at": "2026-09-17T14:10:00Z",
+        "content": "Depends on your country! If your country is a member of the Hague Apostille Convention, only an Apostille is needed. If non-Hague, you need Ministry of Foreign Affairs stamp + Austrian Embassy diplomatic superlegalization.",
+        "upvotes": 11
+      }
+    ]
+  },
+  {
+    "id": "post-003",
+    "title": "TUM Munich Informatics Aptitude Assessment (Eignungsverfahren) Stufe 2 Interview Insights",
+    "category": "Admissions & Prerequisites",
+    "country": "Germany",
+    "university": "Technical University of Munich (TUM)",
+    "author_name": "Elena Weber",
+    "author_handle": "@elena_tum",
+    "author_role": "MSc Informatics @ TUM",
+    "created_at": "2026-09-16T09:10:00Z",
+    "upvotes": 53,
+    "tags": [
+      "TUM",
+      "Munich",
+      "Aptitude Assessment",
+      "Algorithms",
+      "Informatics"
+    ],
+    "content": "If your preliminary score in TUM's stage 1 (Stufe 1) is between 50 and 69 points, you will be invited to the 20-minute online interview (Stufe 2). In my interview with two CS professors, they asked 3 core questions: 1) Explain Dijkstra vs A* search and heuristics, 2) Cache locality and memory hierarchy in modern CPUs, 3) Why TUM over other universities. Stay calm, speak clearly in English, and review your undergraduate algorithms coursework!",
+    "comments": [
+      {
+        "id": "c-003-1",
+        "author_name": "David M.",
+        "author_handle": "@david_germany",
+        "author_role": "Applicant 2026",
+        "created_at": "2026-09-16T12:00:00Z",
+        "content": "Is the tuition fee in Bavaria still €0 for international students at TUM or did the new international fee apply?",
+        "upvotes": 7
+      },
+      {
+        "id": "c-003-2",
+        "author_name": "Elena Weber",
+        "author_handle": "@elena_tum",
+        "author_role": "MSc Informatics @ TUM",
+        "created_at": "2026-09-16T13:30:00Z",
+        "content": "TUM introduced non-EU tuition fees (€4,000 to €6,000 per semester for certain master degrees), whereas other Bavarian universities like LMU Munich and FAU Erlangen are still almost free (€150 admin fee only). Check our tuition filter slider on the site!",
+        "upvotes": 15
+      }
+    ]
+  },
+  {
+    "id": "post-004",
+    "title": "Working 20h/week as a Software Engineer student in Vienna: Taxes, contracts & study balance",
+    "category": "Jobs & Career",
+    "country": "Austria",
+    "university": "TU Wien",
+    "author_name": "Lukas Novak",
+    "author_handle": "@lukas_vienna_dev",
+    "author_role": "MSc Software Engineering @ TU Wien & Part-time Dev @ Dynatrace",
+    "created_at": "2026-09-15T18:00:00Z",
+    "upvotes": 89,
+    "tags": [
+      "Vienna",
+      "Work Rights",
+      "20h Week",
+      "Dynatrace",
+      "Salaries",
+      "RWR Card"
+    ],
+    "content": "Under the Austrian Student Residence Permit, third-country nationals have the legal right to work up to 20 hours per week. Typical student developer wages in Vienna range from €15 to €22 gross per hour (approx €1,200 to €1,800/month for 20h/week). Because income up to €12,816/year is taxed at 0% in Austria, you take home nearly all of it after social insurance. Many companies (Dynatrace, Bitpanda, Erste Group, Siemens) actively hire student developers. Best of all: after graduation, your employer can transition you straight to the Red-White-Red Card without AMS labor market testing!",
+    "comments": [
+      {
+        "id": "c-004-1",
+        "author_name": "Tariq Mansoor",
+        "author_handle": "@tariq_dev",
+        "author_role": "MSc Student @ Uni Vienna",
+        "created_at": "2026-09-15T19:20:00Z",
+        "content": "Can confirm! Erste Digital and Dynatrace have huge student hubs in Vienna. The 20h limit is strictly tracked by the AMS work permit (Beschäftigungsbewilligung), so never exceed 20h during term time.",
+        "upvotes": 9
+      }
+    ]
+  },
+  {
+    "id": "post-005",
+    "title": "TU Wien vs University of Vienna for Data Science: Which one should you pick?",
+    "category": "Course & University Reviews",
+    "country": "Austria",
+    "university": "TU Wien / University of Vienna",
+    "author_name": "Clara Holzer",
+    "author_handle": "@clara_ds",
+    "author_role": "Alumna MSc Data Science @ Uni Vienna",
+    "created_at": "2026-09-14T10:45:00Z",
+    "upvotes": 74,
+    "tags": [
+      "TU Wien",
+      "Uni Vienna",
+      "Data Science",
+      "Curriculum",
+      "Machine Learning"
+    ],
+    "content": "Both are world-class programs in Vienna, but with distinct philosophies: TU Wien's Data Science is heavily engineering and systems-focused (distributed big data pipelines, Spark, GPU computing, low-level algorithms, rigorous discrete math). University of Vienna's Data Science program leans more heavily into mathematical statistics, Bayesian inference, and scientific machine learning with the Faculty of Mathematics. If you want production engineering, go TU Wien; if you want deep statistical research and ML theory, pick Uni Vienna. Both have €24.70/sem tuition for EU and €726.72 for non-EU.",
+    "comments": [
+      {
+        "id": "c-005-1",
+        "author_name": "Mateo Rossi",
+        "author_handle": "@mateo_ds",
+        "author_role": "Applicant Fall 2026",
+        "created_at": "2026-09-14T12:30:00Z",
+        "content": "Super insightful comparison Clara! How are the classes scheduled? Is it possible to attend classes while working part-time?",
+        "upvotes": 6
+      }
+    ]
+  }
+]

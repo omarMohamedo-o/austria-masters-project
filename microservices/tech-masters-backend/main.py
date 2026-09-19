@@ -790,3 +790,267 @@ def get_kafka_broker_status():
 def manual_publish_stream_event(event_type: str = Body(...), payload: Dict[str, Any] = Body(...)):
     evt = publish_event(event_type, payload)
     return {"status": "published", "event": evt}
+
+# ----------------- COMMUNITY KNOWLEDGE SHARING PLATFORM -----------------
+
+class CommunityComment(BaseModel):
+    id: str
+    author_name: str
+    author_handle: str
+    author_role: str
+    created_at: str
+    content: str
+    upvotes: int = 0
+
+class CommunityPost(BaseModel):
+    id: str
+    title: str
+    category: str
+    country: str
+    university: str
+    author_name: str
+    author_handle: str
+    author_role: str
+    created_at: str
+    upvotes: int = 0
+    tags: List[str] = []
+    content: str
+    comments: List[CommunityComment] = []
+
+class CreatePostRequest(BaseModel):
+    title: str
+    category: str
+    country: str
+    university: str
+    author_name: str
+    author_handle: Optional[str] = None
+    author_role: str
+    content: str
+    tags: List[str] = []
+
+class CreateCommentRequest(BaseModel):
+    author_name: str
+    author_handle: Optional[str] = None
+    author_role: str
+    content: str
+
+class GradeConversionRequest(BaseModel):
+    max_grade: float
+    min_passing_grade: float
+    actual_grade: float
+
+community_path = os.path.join(os.path.dirname(__file__), '../../data/community_posts.json')
+requirements_path = os.path.join(os.path.dirname(__file__), '../../data/requirements_guide.json')
+payout_path = os.path.join(os.path.dirname(__file__), '../../data/payout_settings.json')
+
+community_posts_db: List[CommunityPost] = []
+
+def load_community_posts():
+    global community_posts_db
+    community_posts_db = []
+    if os.path.exists(community_path):
+        with open(community_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            for item in data:
+                community_posts_db.append(CommunityPost(**item))
+
+def save_community_posts():
+    with open(community_path, 'w', encoding='utf-8') as f:
+        json.dump([p.dict() for p in community_posts_db], f, indent=2, ensure_ascii=False)
+
+load_community_posts()
+
+@app.get("/api/community/posts", response_model=List[CommunityPost])
+def get_community_posts(
+    category: Optional[str] = None,
+    country: Optional[str] = None,
+    university: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: Optional[str] = Query("popular", enum=["popular", "recent"])
+):
+    results = community_posts_db
+
+    if category and category.lower() != "all":
+        results = [p for p in results if p.category.lower() == category.lower()]
+
+    if country and country.lower() != "all":
+        results = [p for p in results if p.country.lower() == country.lower()]
+
+    if university and university.lower() != "all":
+        results = [p for p in results if university.lower() in p.university.lower()]
+
+    if search:
+        q = search.lower()
+        results = [
+            p for p in results
+            if q in p.title.lower() or q in p.content.lower() or any(q in t.lower() for t in p.tags)
+        ]
+
+    if sort_by == "popular":
+        results = sorted(results, key=lambda x: x.upvotes, reverse=True)
+    elif sort_by == "recent":
+        results = sorted(results, key=lambda x: x.created_at, reverse=True)
+
+    return results
+
+@app.post("/api/community/posts")
+def create_community_post(post_req: CreatePostRequest):
+    post_id = f"post-{int(time.time())}"
+    handle = post_req.author_handle or f"@{post_req.author_name.lower().replace(' ', '_')}"
+    created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+    new_post = CommunityPost(
+        id=post_id,
+        title=post_req.title,
+        category=post_req.category,
+        country=post_req.country,
+        university=post_req.university,
+        author_name=post_req.author_name,
+        author_handle=handle,
+        author_role=post_req.author_role,
+        created_at=created_at,
+        upvotes=1,
+        tags=post_req.tags,
+        content=post_req.content,
+        comments=[]
+    )
+
+    community_posts_db.insert(0, new_post)
+    save_community_posts()
+
+    # Emit Kafka event
+    publish_event("COMMUNITY_POST_CREATED", {
+        "id": new_post.id,
+        "title": new_post.title,
+        "author": new_post.author_name,
+        "category": new_post.category,
+        "university": new_post.university,
+        "timestamp": created_at
+    })
+
+    return {"status": "created", "post": new_post}
+
+@app.post("/api/community/posts/{post_id}/upvote")
+def upvote_community_post(post_id: str):
+    for p in community_posts_db:
+        if p.id == post_id:
+            p.upvotes += 1
+            save_community_posts()
+            publish_event("COMMUNITY_POST_UPVOTED", {
+                "post_id": post_id,
+                "title": p.title,
+                "upvotes": p.upvotes
+            })
+            return {"status": "upvoted", "post_id": post_id, "upvotes": p.upvotes}
+    raise HTTPException(status_code=404, detail="Post not found")
+
+@app.post("/api/community/posts/{post_id}/comments")
+def add_community_comment(post_id: str, comment_req: CreateCommentRequest):
+    for p in community_posts_db:
+        if p.id == post_id:
+            c_id = f"c-{int(time.time())}"
+            handle = comment_req.author_handle or f"@{comment_req.author_name.lower().replace(' ', '_')}"
+            created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+            comment = CommunityComment(
+                id=c_id,
+                author_name=comment_req.author_name,
+                author_handle=handle,
+                author_role=comment_req.author_role,
+                created_at=created_at,
+                content=comment_req.content,
+                upvotes=1
+            )
+            p.comments.append(comment)
+            save_community_posts()
+
+            # Emit Kafka event
+            publish_event("COMMUNITY_COMMENT_ADDED", {
+                "post_id": post_id,
+                "comment_id": c_id,
+                "author": comment.author_name,
+                "timestamp": created_at
+            })
+
+            return {"status": "comment_added", "comment": comment}
+    raise HTTPException(status_code=404, detail="Post not found")
+
+# ----------------- MASTER REQUIREMENTS & BAVARIAN GRADE CONVERTER -----------------
+
+@app.get("/api/requirements")
+def get_requirements():
+    if os.path.exists(requirements_path):
+        with open(requirements_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    raise HTTPException(status_code=404, detail="Requirements guide not found")
+
+@app.post("/api/requirements/convert-grade")
+def convert_bavarian_grade(req: GradeConversionRequest):
+    if req.max_grade == req.min_passing_grade:
+        raise HTTPException(status_code=400, detail="Max grade and min passing grade cannot be equal.")
+
+    # Modified Bavarian Formula: N = 1 + 3 * ((N_max - N_d) / (N_max - N_min))
+    converted = 1.0 + 3.0 * ((req.max_grade - req.actual_grade) / (req.max_grade - req.min_passing_grade))
+    # Clamp between 1.0 (highest) and 5.0 (lowest)
+    converted_clamped = max(1.0, min(5.0, converted))
+    grade_rounded = round(converted_clamped, 2)
+
+    if grade_rounded <= 1.5:
+        category = "Sehr gut (Outstanding)"
+        competitiveness = "Extremely Competitive — Direct shortlist potential at TU Wien, TUM, Uni Vienna"
+        color = "emerald"
+    elif grade_rounded <= 2.5:
+        category = "Gut (Good / Above Average)"
+        competitiveness = "Highly Competitive — Fulfills standard GPA thresholds for European Master admissions"
+        color = "teal"
+    elif grade_rounded <= 3.5:
+        category = "Befriedigend (Satisfactory)"
+        competitiveness = "Eligible — May be asked for GRE Quantitative 160+ or additional aptitude interview"
+        color = "amber"
+    elif grade_rounded <= 4.0:
+        category = "Ausreichend (Minimum Pass)"
+        competitiveness = "Borderline — Requires strong statement of purpose, publications, or practical experience"
+        color = "orange"
+    else:
+        category = "Nicht ausreichend (Ineligible)"
+        competitiveness = "Below statutory Master's entry threshold"
+        color = "rose"
+
+    return {
+        "converted_grade": grade_rounded,
+        "classification": category,
+        "competitiveness": competitiveness,
+        "color": color,
+        "formula_used": "N = 1 + 3 * ((N_max - N_d) / (N_max - N_min))",
+        "austrian_equivalent": 1 if grade_rounded <= 1.5 else (2 if grade_rounded <= 2.5 else (3 if grade_rounded <= 3.5 else 4))
+    }
+
+# ----------------- ADMIN PAYOUT & MONETIZATION SETTINGS -----------------
+
+DEFAULT_PAYOUT = {
+    "payout_method": "visa_bank_wire",
+    "account_holder": "Omar Mohamed",
+    "iban_or_card": "AT89 3700 **** **** 4821",
+    "bic_swift": "BKAUATWW",
+    "bank_name": "Erste Bank Vienna / Visa Debit Payout",
+    "paypal_email": "admin@techmasters.eu",
+    "stripe_account_id": "acct_1TechMastersStripeConnected",
+    "auto_payout_threshold": 100.00,
+    "payout_schedule": "Monthly on the 21st",
+    "currency": "USD / EUR",
+    "ad_network_mode": "hybrid"
+}
+
+@app.get("/api/admin/payout-settings")
+def get_payout_settings():
+    if os.path.exists(payout_path):
+        with open(payout_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return DEFAULT_PAYOUT
+
+@app.post("/api/admin/payout-settings")
+def update_payout_settings(settings: Dict[str, Any] = Body(...)):
+    with open(payout_path, 'w', encoding='utf-8') as f:
+        json.dump(settings, f, indent=2)
+    return {"status": "success", "settings": settings}
+
