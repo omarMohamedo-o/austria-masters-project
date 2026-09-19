@@ -634,6 +634,104 @@ export default function ProgramList({
 
   const hasActiveFilters = activeFiltersCount > 0;
 
+  // Accurate Status Resolver according to Austrian UG 2002 § 64a and official deadlines on 19 September 2026
+  const getEffectiveStatus = (p: Program, isNonEu: boolean) => {
+    const inst = (p.inst || "").toLowerCase();
+
+    // 1. University of Vienna (Universität Wien)
+    // Non-EU Winter closed 3 Aug 2026; EU closed 5 Sep 2026. Next: Summer 2027 (Opens 16 Nov 2026)
+    if (inst.includes("university of vienna") && !inst.includes("medical")) {
+      return {
+        status: "closed" as const,
+        label: isNonEu ? "Winter Closed (3 Aug) · Summer Opens 16 Nov" : "Winter Closed (5 Sep) · Summer Opens 7 Jan",
+        badgeColor: "rose" as const,
+        isClosedForUser: true
+      };
+    }
+
+    // 2. TU Wien
+    // Non-EU Winter closed 3 Aug 2026. Summer opens Jan 2027.
+    // EU general admission period open until 31 Oct 2026.
+    if (inst.includes("tu wien")) {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed for Non-EU · Summer Opens Jan",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU General Window)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    // 3. University of Innsbruck (Quantum)
+    if (inst.includes("innsbruck")) {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed for Non-EU (Was 5 Sep)",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU to 31 Oct)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    // 4. University of Klagenfurt (Cloud Computing & Distributed Systems)
+    if (inst.includes("klagenfurt") && p.status === "open") {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed for Non-EU (Was 5 Sep)",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU to 31 Oct)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    // 5. Paris Lodron University of Salzburg (HCI)
+    if (inst.includes("salzburg") && inst.includes("paris lodron") && p.status === "open") {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed for Non-EU (Was 1 Sep)",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU to 31 Oct)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    const s = (p.status as any) || "open";
+    return {
+      status: s as "open" | "soon" | "closed",
+      label: p.statusLabel || (s === "open" ? "Open Now" : s === "soon" ? "Opening Soon" : "Closed"),
+      badgeColor: (s === "open" ? "emerald" : s === "soon" ? "amber" : "rose") as "emerald" | "amber" | "rose",
+      isClosedForUser: s === "closed"
+    };
+  };
+
   // Filter & Sort Programs
   const filteredPrograms = useMemo(() => {
     let list = (programs || []).filter((p) => {
@@ -675,7 +773,9 @@ export default function ProgramList({
           (p.tags || []).some(t => t.toLowerCase().includes("deep learning") || t.toLowerCase() === "dl")
         ));
 
-      const matchesStatus = filterStatus === "all" ? true : p.status === filterStatus;
+      // Resolve dynamic status based on selected applicant citizenship (Non-EU vs EU)
+      const effStatus = getEffectiveStatus(p, feeType === "nonEu");
+      const matchesStatus = filterStatus === "all" ? true : effStatus.status === filterStatus;
       
       let matchesField = true;
       if (filterField !== "all") {
@@ -928,6 +1028,42 @@ export default function ProgramList({
 
               {/* Scrollable Filters Body (Scrolls strictly underneath the fixed header divider) */}
               <div className="p-4 sm:p-5 pt-3.5 space-y-4 overflow-y-auto overscroll-contain custom-scrollbar flex-1">
+                {/* 0. Applicant Citizenship / Category (Crucial for Austrian & German Deadlines) */}
+                <div className="bg-[#141d1a] p-3 rounded-2xl border border-[#273430] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-[#7ec8a7]" />
+                      Applicant Citizenship
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">Date: 19 Sep 2026</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 bg-[#0a0f0e] p-1 rounded-xl border border-[#1f2c27]">
+                    <button
+                      type="button"
+                      onClick={() => setFeeType("nonEu")}
+                      className={`py-1.5 px-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+                        feeType === "nonEu" ? "bg-[#7ec8a7] text-[#0d1613] shadow" : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <span>🌍 Non-EU (Egypt)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFeeType("eu")}
+                      className={`py-1.5 px-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+                        feeType === "eu" ? "bg-[#7ec8a7] text-[#0d1613] shadow" : "text-slate-400 hover:text-white"
+                      }`}
+                    >
+                      <span>🇪🇺 EU / EEA</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-tight">
+                    {feeType === "nonEu"
+                      ? "Displaying Non-EU statutory deadlines (Winter 2026/27 closed Aug 3; Summer 2027 opens Nov 16)."
+                      : "Displaying EU/EEA general admission deadlines."}
+                  </p>
+                </div>
+
                 {/* 1. Keyword Search Input */}
               <div>
                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
@@ -1251,6 +1387,9 @@ export default function ProgramList({
                   prog.inst.toLowerCase().includes("hagenberg") ? "https://www.fh-ooe.at/campus-hagenberg/" : "https://www.studienwahl.at"
                 );
 
+                // Dynamic effective status for this program according to simulated date (19 Sep 2026) and user citizenship
+                const effStatus = getEffectiveStatus(prog, feeType === "nonEu");
+
                 // Check if we should insert an In-Feed Ad at position 2 or 5
                 const adIndex = idx === 2 ? 0 : idx === 5 ? 1 : -1;
                 const inFeedAd = adIndex >= 0 && inFeedAds[adIndex] ? inFeedAds[adIndex] : null;
@@ -1318,14 +1457,14 @@ export default function ProgramList({
                         {/* Header Row: Status, World Rank, and Field */}
                         <div className="flex items-center justify-between gap-2 mb-3.5 flex-wrap">
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-full border ${
-                            prog.status === "open"
+                            effStatus.status === "open"
                               ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
-                              : prog.status === "soon"
+                              : effStatus.status === "soon"
                               ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
                               : "bg-rose-500/10 border-rose-500/25 text-rose-300"
                           }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${prog.status === "open" ? "bg-emerald-400 animate-pulse" : prog.status === "soon" ? "bg-amber-400" : "bg-rose-400"}`} />
-                            <span className="truncate max-w-[160px]">{prog.statusLabel || (prog.status === "open" ? "Open Now" : "Closed")}</span>
+                            <span className={`w-1.5 h-1.5 rounded-full ${effStatus.status === "open" ? "bg-emerald-400 animate-pulse" : effStatus.status === "soon" ? "bg-amber-400" : "bg-rose-400"}`} />
+                            <span className="truncate max-w-[210px]" title={effStatus.label}>{effStatus.label}</span>
                           </span>
 
                           {/* World Ranking Badge */}
@@ -1395,14 +1534,24 @@ export default function ProgramList({
                               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Deadlines</span>
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">EU Students</span>
+                              <div className={`rounded-lg p-2.5 border transition-all ${feeType === "eu" ? "bg-[#10241e] border-[#7ec8a7]/50 ring-1 ring-[#7ec8a7]/30" : "bg-[#141d1a] border-[#273430]"}`}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase">EU Students</span>
+                                  {feeType === "eu" && (
+                                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 bg-[#7ec8a7]/20 text-[#7ec8a7] rounded uppercase">Active Status</span>
+                                  )}
+                                </div>
                                 <span className="text-slate-200 font-medium break-words leading-tight block">
                                   {prog.deadlineEU || "See official site"}
                                 </span>
                               </div>
-                              <div className="bg-[#141d1a] rounded-lg p-2.5 border border-[#273430]">
-                                <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">Non-EU Students</span>
+                              <div className={`rounded-lg p-2.5 border transition-all ${feeType === "nonEu" ? "bg-[#10241e] border-[#7ec8a7]/50 ring-1 ring-[#7ec8a7]/30" : "bg-[#141d1a] border-[#273430]"}`}>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase">Non-EU (Egypt)</span>
+                                  {feeType === "nonEu" && (
+                                    <span className="text-[9px] font-extrabold px-1.5 py-0.5 bg-[#7ec8a7]/20 text-[#7ec8a7] rounded uppercase">Active Status</span>
+                                  )}
+                                </div>
                                 <span className="text-slate-200 font-medium break-words leading-tight block">
                                   {prog.deadlineNonEU || "See official site"}
                                 </span>
@@ -1582,20 +1731,20 @@ export default function ProgramList({
                         </button>
                         <button
                           type="button"
-                          disabled={prog.status !== "open"}
+                          disabled={effStatus.status !== "open"}
                           onClick={() => {
-                            if (prog.status === "open") {
+                            if (effStatus.status === "open") {
                               handleOpenGatewayModal(prog, "apply");
                             }
                           }}
                           className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 cursor-pointer ${
-                            prog.status === "open"
+                            effStatus.status === "open"
                               ? "bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] border-[#7ec8a7] shadow-md shadow-[#7ec8a7]/20 font-bold"
-                              : "bg-[#18211f] hover:bg-[#273430] text-slate-400 border-[#2d3a36] cursor-not-allowed"
+                              : "bg-[#18211f] hover:bg-[#273430] text-slate-500 border-[#2d3a36] cursor-not-allowed"
                           }`}
                         >
                           <GraduationCap className="w-4 h-4 shrink-0" />
-                          <span>Apply Now</span>
+                          <span>{effStatus.status === "open" ? "Apply Now" : "Intake Closed"}</span>
                         </button>
                       </div>
                     </motion.div>
