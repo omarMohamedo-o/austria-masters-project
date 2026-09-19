@@ -33,12 +33,10 @@ export default function RootLayout({
       <head>
         {/* Google AdSense Script Integration */}
         {ADSENSE_CLIENT_ID && (
-          <Script
-            id="google-adsense"
+          <script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
             crossOrigin="anonymous"
-            strategy="afterInteractive"
           />
         )}
       </head>
