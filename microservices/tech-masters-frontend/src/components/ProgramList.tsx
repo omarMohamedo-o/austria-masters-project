@@ -783,11 +783,11 @@ export default function ProgramList({
 
         {/* Two-Column Layout: Left Sidebar for Search & Droplists, Right for Program Results */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* LEFT SIDEBAR: Search Settings (Droplists on the left) */}
-          <aside className="lg:col-span-4 xl:col-span-3.5 space-y-4 lg:sticky lg:top-20 z-20">
-            <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
-              {/* Sidebar Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-[#1f2c27]">
+          {/* LEFT SIDEBAR: Search Settings (Droplists on the left) - Scrollable alone */}
+          <aside className="lg:col-span-4 xl:col-span-3.5 lg:sticky lg:top-20 z-20">
+            <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain custom-scrollbar pr-3">
+              {/* Sidebar Header (Sticky inside sidebar) */}
+              <div className="sticky top-0 bg-[#0e1413]/95 backdrop-blur-md z-10 -mt-2 pt-2 pb-3 border-b border-[#1f2c27] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-[#7ec8a7]" />
                   <h2 className="text-white font-extrabold text-sm uppercase tracking-wider">
