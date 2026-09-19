@@ -49,36 +49,6 @@ new_programs = [
         "feeFree": True
     },
     {
-        "title": "Machine Learning & Deep Neural Systems (MSc)",
-        "inst": "JKU Linz — LIT AI Lab",
-        "field": "Machine Learning & Deep Learning",
-        "status": "open",
-        "statusLabel": "Open now",
-        "sortDate": "2026-10-31",
-        "dateLabel": "Applications close 31 Oct 2026",
-        "deadlineEU": "Applications close 31 Oct 2026",
-        "deadlineNonEU": "Applications close 31 Oct 2026",
-        "windowLabel": "Open since 6 Sep 2026",
-        "desc": "Specialized Deep Learning curriculum headed by Prof. Sepp Hochreiter (co-inventor of LSTM). Focuses on modern transformer architectures, foundational models, diffusion algorithms, and sequence learning.",
-        "tags": [
-            "120 ECTS",
-            "English",
-            "Deep Learning",
-            "Machine Learning",
-            "LSTM Core",
-            "Transformers",
-            "Research-grade"
-        ],
-        "lang": "English",
-        "url": "https://www.jku.at/en/degree-programs/types-of-degree-programs/masters-degree-programs/ma-artificial-intelligence/",
-        "applyUrl": "https://zulassung.jku.at/auth/anmelden",
-        "feeEU": "Free (ÖH fee only, €26.20/sem)",
-        "feeEUNote": "within standard duration + 2 tolerance semesters; €363.36/sem after",
-        "feeNonEU": "€726.72/semester",
-        "feeApp": "No separate application fee",
-        "feeFree": True
-    },
-    {
         "title": "Machine Learning & Autonomous Intelligence (MSc)",
         "inst": "TU Graz",
         "field": "Machine Learning & Deep Learning",
