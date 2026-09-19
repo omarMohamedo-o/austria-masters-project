@@ -429,6 +429,60 @@ export default function ProgramList({
     }
   };
 
+  // Interstitial Apply Now Ad Modal State
+  const [applyModalProgram, setApplyModalProgram] = useState<Program | null>(null);
+  const [countdown, setCountdown] = useState<number>(5);
+  const [isAutoRedirectActive, setIsAutoRedirectActive] = useState<boolean>(true);
+  const [modalAd, setModalAd] = useState<Ad | null>(null);
+
+  // All available ads pool for interstitial modal
+  const allAdsPool = useMemo(() => {
+    const list: Ad[] = [];
+    if (topBanner) list.push(topBanner);
+    if (inFeedAds && inFeedAds.length > 0) list.push(...inFeedAds);
+    return list.length > 0 ? list : [FALLBACK_ADS.topBanner, ...FALLBACK_ADS.inFeedAds];
+  }, [topBanner, inFeedAds]);
+
+  // Open the Apply Now interstitial ad window
+  const handleOpenApplyModal = (prog: Program) => {
+    const adIdx = Math.abs(prog.title.length) % allAdsPool.length;
+    setModalAd(allAdsPool[adIdx] || allAdsPool[0]);
+    setApplyModalProgram(prog);
+    setCountdown(5);
+    setIsAutoRedirectActive(true);
+  };
+
+  // Close the Apply Now ad window
+  const handleCloseApplyModal = () => {
+    setApplyModalProgram(null);
+    setIsAutoRedirectActive(false);
+  };
+
+  // Trigger immediate navigation to the official application portal
+  const handleProceedToApply = () => {
+    if (!applyModalProgram) return;
+    const url = applyModalProgram.applyUrl;
+    setApplyModalProgram(null);
+    setIsAutoRedirectActive(false);
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  // Auto-redirect countdown effect
+  useEffect(() => {
+    if (!applyModalProgram || !isAutoRedirectActive) return;
+
+    if (countdown <= 0) {
+      handleProceedToApply();
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [applyModalProgram, isAutoRedirectActive, countdown]);
+
   // Complete cities directory for Austria & Germany
   const citiesByCountry: Record<string, string[]> = {
     Austria: [
@@ -1149,7 +1203,7 @@ export default function ProgramList({
                 const inFeedAd = adIndex >= 0 && inFeedAds[adIndex] ? inFeedAds[adIndex] : null;
 
                 return (
-                  <React.Fragment key={`${prog.title}-${prog.inst}`}>
+                  <Fragment key={`${prog.title}-${prog.inst}`}>
                     {/* In-feed Sponsored Ad Card */}
                     {inFeedAd && (
                       <motion.div
@@ -1413,6 +1467,37 @@ export default function ProgramList({
                                   </p>
                                 </div>
                               )}
+
+                              {/* Contextual Sponsored Grant & Prep Offer inside Details */}
+                              <div className="mt-3 p-3.5 bg-gradient-to-r from-amber-500/15 via-[#7ec8a7]/10 to-[#141d1a] rounded-xl border border-amber-500/35 shadow-sm">
+                                <div className="flex items-center justify-between gap-2 mb-1.5">
+                                  <span className="px-2 py-0.5 rounded bg-amber-500/25 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/40 flex items-center gap-1">
+                                    <Sparkles className="w-3 h-3 text-amber-400" />
+                                    SPONSORED PARTNER
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 font-mono">Admission Resource</span>
+                                </div>
+                                <h4 className="font-bold text-white text-xs sm:text-sm mb-1">
+                                  Austrian Government Tech Scholarships 2026/27
+                                </h4>
+                                <p className="text-slate-300 text-[11px] leading-relaxed mb-2.5">
+                                  Receive up to €1,200/month living stipend + full tuition waiver for international Master&apos;s students in Austrian technical universities.
+                                </p>
+                                <div className="flex items-center justify-between gap-3">
+                                  <span className="text-[10px] text-emerald-400 font-medium">
+                                    ÖAD Official Grant Partner
+                                  </span>
+                                  <a
+                                    href="https://grants.at/en/"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    onClick={() => handleAdClick("ad_scholarship_oead")}
+                                    className="inline-flex items-center gap-1 px-3 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs rounded-lg transition-all shadow-sm"
+                                  >
+                                    Claim Grant <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -1443,25 +1528,26 @@ export default function ProgramList({
                           <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                           <span>Details</span>
                         </a>
-                        <a
-                          href={prog.applyUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 ${
+                        <button
+                          type="button"
+                          disabled={prog.status !== "open"}
+                          onClick={() => {
+                            if (prog.status === "open") {
+                              handleOpenApplyModal(prog);
+                            }
+                          }}
+                          className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 cursor-pointer ${
                             prog.status === "open"
                               ? "bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] border-[#7ec8a7] shadow-md shadow-[#7ec8a7]/20 font-bold"
                               : "bg-[#18211f] hover:bg-[#273430] text-slate-400 border-[#2d3a36] cursor-not-allowed"
                           }`}
-                          onClick={(e) => {
-                            if (prog.status !== "open") e.preventDefault();
-                          }}
                         >
                           <GraduationCap className="w-4 h-4 shrink-0" />
                           <span>Apply Now</span>
-                        </a>
+                        </button>
                       </div>
                     </motion.div>
-                  </React.Fragment>
+                  </Fragment>
                 );
               })}
           </div>
@@ -1565,6 +1651,122 @@ export default function ProgramList({
           </main>
         </div>
       </div>
+
+      {/* INTERSTITIAL APPLY NOW AD MODAL */}
+      {applyModalProgram && modalAd && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="max-w-lg w-full bg-[#0c1411] border border-amber-500/40 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-amber-950/40 text-white relative overflow-hidden space-y-5">
+            {/* Top Background Gradient Glow */}
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#7ec8a7]/15 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-[#232f2b] pb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-extrabold text-[10px] tracking-wider uppercase border border-amber-500/40 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    SPONSORED PARTNER
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-medium">Gateway Redirect</span>
+                </div>
+                <h3 className="text-base sm:text-lg font-bold text-white">
+                  Opening Official Application Portal
+                </h3>
+                <p className="text-xs text-slate-400">
+                  {applyModalProgram.title} · <span className="text-[#7ec8a7]">{applyModalProgram.inst}</span>
+                </p>
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={handleCloseApplyModal}
+                className="p-1.5 rounded-xl bg-[#141d1a] border border-[#273430] hover:border-rose-500/50 hover:text-rose-300 text-slate-400 transition-all cursor-pointer"
+                title="Close Ad and stay on page"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Sponsored Ad Box */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#18231e] to-[#101815] border border-amber-500/40 space-y-3 shadow-lg">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-semibold text-slate-400">{modalAd.client}</span>
+                <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[10px] font-bold">
+                  {modalAd.badge}
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-base sm:text-lg font-extrabold text-white leading-snug mb-1">
+                  {modalAd.title}
+                </h4>
+                <p className="text-xs font-semibold text-teal-300 mb-2">
+                  {modalAd.tagline}
+                </p>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {modalAd.description}
+                </p>
+              </div>
+
+              <a
+                href={modalAd.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() => handleAdClick(modalAd.id)}
+                className="inline-flex items-center justify-center gap-2 w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm transition-all shadow-md shadow-amber-500/25 active:scale-95"
+              >
+                {modalAd.cta} <ExternalLink className="w-4 h-4" />
+              </a>
+            </div>
+
+            {/* Countdown & Auto-Redirect Section */}
+            <div className="space-y-2.5 pt-1">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-300 font-medium flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#7ec8a7]" />
+                  {isAutoRedirectActive ? (
+                    <>Redirecting automatically in <strong className="text-amber-400 font-bold font-mono text-sm">{countdown}s</strong>...</>
+                  ) : (
+                    <span className="text-slate-400">Auto-redirect paused</span>
+                  )}
+                </span>
+                <button
+                  onClick={() => setIsAutoRedirectActive(!isAutoRedirectActive)}
+                  className="text-[11px] text-slate-400 hover:text-white underline cursor-pointer"
+                >
+                  {isAutoRedirectActive ? "Pause Timer" : "Resume Timer"}
+                </button>
+              </div>
+
+              {/* Animated Countdown Progress Bar */}
+              <div className="w-full h-1.5 bg-[#1a2521] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#7ec8a7] to-amber-400 transition-all duration-1000 ease-linear rounded-full"
+                  style={{ width: `${(countdown / 5) * 100}%` }}
+                />
+              </div>
+
+              {/* Modal Action Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                <button
+                  onClick={handleCloseApplyModal}
+                  className="py-2.5 px-4 rounded-xl bg-[#141d1a] hover:bg-[#1d2924] border border-[#273430] text-slate-300 hover:text-white text-xs font-semibold transition-all cursor-pointer"
+                >
+                  Close & Return
+                </button>
+                <button
+                  onClick={handleProceedToApply}
+                  className="py-2.5 px-4 rounded-xl bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] font-extrabold text-xs transition-all shadow-md shadow-[#7ec8a7]/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>Continue to Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
