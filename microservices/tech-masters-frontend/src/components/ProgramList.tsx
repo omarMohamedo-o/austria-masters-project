@@ -429,8 +429,13 @@ export default function ProgramList({
     }
   };
 
-  // Interstitial Apply Now Ad Modal State
-  const [applyModalProgram, setApplyModalProgram] = useState<Program | null>(null);
+  // Interstitial Gateway Ad Modal State (for both Details & Apply Now)
+  const [gatewayModal, setGatewayModal] = useState<{
+    program: Program;
+    targetUrl: string;
+    actionType: "apply" | "details";
+    title: string;
+  } | null>(null);
   const [countdown, setCountdown] = useState<number>(5);
   const [isAutoRedirectActive, setIsAutoRedirectActive] = useState<boolean>(true);
   const [modalAd, setModalAd] = useState<Ad | null>(null);
@@ -443,36 +448,53 @@ export default function ProgramList({
     return list.length > 0 ? list : [FALLBACK_ADS.topBanner, ...FALLBACK_ADS.inFeedAds];
   }, [topBanner, inFeedAds]);
 
-  // Open the Apply Now interstitial ad window
-  const handleOpenApplyModal = (prog: Program) => {
-    const adIdx = Math.abs(prog.title.length) % allAdsPool.length;
-    setModalAd(allAdsPool[adIdx] || allAdsPool[0]);
-    setApplyModalProgram(prog);
+  // Open the Gateway interstitial ad window (for either Details or Apply Now)
+  const handleOpenGatewayModal = (prog: Program, actionType: "apply" | "details") => {
+    const adIdx = Math.abs((prog.title + actionType).length) % allAdsPool.length;
+    const chosenAd = allAdsPool[adIdx] || allAdsPool[0];
+    setModalAd(chosenAd);
+
+    const targetUrl = actionType === "apply" ? prog.applyUrl : prog.url;
+    const title = actionType === "apply" 
+      ? "Opening Official University Application Portal"
+      : "Opening Official Program Curriculum & Details";
+
+    setGatewayModal({
+      program: prog,
+      targetUrl,
+      actionType,
+      title
+    });
     setCountdown(5);
     setIsAutoRedirectActive(true);
+
+    // Track ad impression & credit monetization earning
+    if (chosenAd) {
+      handleAdClick(chosenAd.id);
+    }
   };
 
-  // Close the Apply Now ad window
-  const handleCloseApplyModal = () => {
-    setApplyModalProgram(null);
+  // Close the ad window
+  const handleCloseGatewayModal = () => {
+    setGatewayModal(null);
     setIsAutoRedirectActive(false);
   };
 
-  // Trigger immediate navigation to the official application portal
-  const handleProceedToApply = () => {
-    if (!applyModalProgram) return;
-    const url = applyModalProgram.applyUrl;
-    setApplyModalProgram(null);
+  // Trigger immediate navigation to the official target link
+  const handleProceedToGateway = () => {
+    if (!gatewayModal) return;
+    const url = gatewayModal.targetUrl;
+    setGatewayModal(null);
     setIsAutoRedirectActive(false);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   // Auto-redirect countdown effect
   useEffect(() => {
-    if (!applyModalProgram || !isAutoRedirectActive) return;
+    if (!gatewayModal || !isAutoRedirectActive) return;
 
     if (countdown <= 0) {
-      handleProceedToApply();
+      handleProceedToGateway();
       return;
     }
 
@@ -481,7 +503,7 @@ export default function ProgramList({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [applyModalProgram, isAutoRedirectActive, countdown]);
+  }, [gatewayModal, isAutoRedirectActive, countdown]);
 
   // Complete cities directory for Austria & Germany
   const citiesByCountry: Record<string, string[]> = {
@@ -1519,21 +1541,20 @@ export default function ProgramList({
 
                       {/* Actions */}
                       <div className="p-3.5 sm:p-4 bg-[#080d0c] border-t border-[#232f2b] grid grid-cols-2 gap-3 mt-auto">
-                        <a
-                          href={prog.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#18211f] hover:bg-[#273430] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#2d3a36] active:scale-95"
+                        <button
+                          type="button"
+                          onClick={() => handleOpenGatewayModal(prog, "details")}
+                          className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#18211f] hover:bg-[#273430] hover:text-white text-slate-300 text-xs sm:text-sm font-medium transition-colors border border-[#2d3a36] active:scale-95 cursor-pointer"
                         >
                           <ExternalLink className="w-3.5 h-3.5 shrink-0" />
                           <span>Details</span>
-                        </a>
+                        </button>
                         <button
                           type="button"
                           disabled={prog.status !== "open"}
                           onClick={() => {
                             if (prog.status === "open") {
-                              handleOpenApplyModal(prog);
+                              handleOpenGatewayModal(prog, "apply");
                             }
                           }}
                           className={`flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border active:scale-95 cursor-pointer ${
@@ -1652,8 +1673,8 @@ export default function ProgramList({
         </div>
       </div>
 
-      {/* INTERSTITIAL APPLY NOW AD MODAL */}
-      {applyModalProgram && modalAd && (
+      {/* INTERSTITIAL GATEWAY AD MODAL (FOR BOTH DETAILS & APPLY NOW) */}
+      {gatewayModal && modalAd && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="max-w-lg w-full bg-[#0c1411] border border-amber-500/40 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-amber-950/40 text-white relative overflow-hidden space-y-5">
             {/* Top Background Gradient Glow */}
@@ -1671,16 +1692,16 @@ export default function ProgramList({
                   <span className="text-[11px] text-slate-400 font-medium">Gateway Redirect</span>
                 </div>
                 <h3 className="text-base sm:text-lg font-bold text-white">
-                  Opening Official Application Portal
+                  {gatewayModal.title}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  {applyModalProgram.title} · <span className="text-[#7ec8a7]">{applyModalProgram.inst}</span>
+                  {gatewayModal.program.title} · <span className="text-[#7ec8a7]">{gatewayModal.program.inst}</span>
                 </p>
               </div>
 
               {/* Close Button */}
               <button
-                onClick={handleCloseApplyModal}
+                onClick={handleCloseGatewayModal}
                 className="p-1.5 rounded-xl bg-[#141d1a] border border-[#273430] hover:border-rose-500/50 hover:text-rose-300 text-slate-400 transition-all cursor-pointer"
                 title="Close Ad and stay on page"
               >
@@ -1750,16 +1771,18 @@ export default function ProgramList({
               {/* Modal Action Buttons */}
               <div className="grid grid-cols-2 gap-3 pt-2">
                 <button
-                  onClick={handleCloseApplyModal}
+                  onClick={handleCloseGatewayModal}
                   className="py-2.5 px-4 rounded-xl bg-[#141d1a] hover:bg-[#1d2924] border border-[#273430] text-slate-300 hover:text-white text-xs font-semibold transition-all cursor-pointer"
                 >
                   Close & Return
                 </button>
                 <button
-                  onClick={handleProceedToApply}
+                  onClick={handleProceedToGateway}
                   className="py-2.5 px-4 rounded-xl bg-[#7ec8a7] hover:bg-teal-400 text-[#0f1a16] font-extrabold text-xs transition-all shadow-md shadow-[#7ec8a7]/20 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <span>Continue to Portal</span>
+                  <span>
+                    {gatewayModal.actionType === "apply" ? "Continue to Application Portal" : "Continue to Degree Details"}
+                  </span>
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
               </div>
