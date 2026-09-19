@@ -497,19 +497,28 @@ export default function ProgramList({
     setFilterCity("all");
     setFilterRanking("all");
     setFilterTuition("all");
+    setFilterAppFee("all");
+    setMaxTuition(3000);
     setSearchTerm("");
     setSortBy("rank_world");
   };
 
-  const hasActiveFilters =
-    filterStatus !== "all" ||
-    filterField !== "all" ||
-    filterLanguage !== "all" ||
-    filterCountry !== "all" ||
-    filterCity !== "all" ||
-    filterRanking !== "all" ||
-    filterTuition !== "all" ||
-    searchTerm.trim() !== "";
+  const activeFiltersCount = useMemo(() => {
+    return (
+      (filterStatus !== "all" ? 1 : 0) +
+      (filterField !== "all" ? 1 : 0) +
+      (filterLanguage !== "all" ? 1 : 0) +
+      (filterCountry !== "all" ? 1 : 0) +
+      (filterCity !== "all" ? 1 : 0) +
+      (filterRanking !== "all" ? 1 : 0) +
+      (filterTuition !== "all" ? 1 : 0) +
+      (filterAppFee !== "all" ? 1 : 0) +
+      (maxTuition < 3000 ? 1 : 0) +
+      (searchTerm.trim() !== "" ? 1 : 0)
+    );
+  }, [filterStatus, filterField, filterLanguage, filterCountry, filterCity, filterRanking, filterTuition, filterAppFee, maxTuition, searchTerm]);
+
+  const hasActiveFilters = activeFiltersCount > 0;
 
   // Filter & Sort Programs
   const filteredPrograms = useMemo(() => {
@@ -772,350 +781,280 @@ export default function ProgramList({
           </div>
         </div>
 
-        {/* Screenshot 1 Exact Customized Pill Filter Box */}
-        <div className="bg-[#0e1413] border border-[#232f2b] rounded-2xl p-5 sm:p-7 mb-6 shadow-2xl space-y-6">
-          {/* Row 1: Status */}
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Status</span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {statusOptions.map((opt) => {
-                const active = filterStatus === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterStatus(opt.value)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+        {/* Two-Column Layout: Left Sidebar for Search & Droplists, Right for Program Results */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* LEFT SIDEBAR: Search Settings (Droplists on the left) */}
+          <aside className="lg:col-span-4 xl:col-span-3.5 space-y-4 lg:sticky lg:top-20 z-20">
+            <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+              {/* Sidebar Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-[#1f2c27]">
+                <div className="flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-[#7ec8a7]" />
+                  <h2 className="text-white font-extrabold text-sm uppercase tracking-wider">
+                    Search Settings
+                  </h2>
+                  {activeFiltersCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full bg-[#7ec8a7]/20 border border-[#7ec8a7]/40 text-[#7ec8a7] text-[10px] font-extrabold font-mono">
+                      {activeFiltersCount} active
+                    </span>
+                  )}
+                </div>
 
-          {/* Row 2: Field */}
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Field</span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {fieldOptions.map((opt) => {
-                const active = filterField === opt.value;
-                return (
+                {hasActiveFilters && (
                   <button
-                    key={opt.value}
-                    onClick={() => setFilterField(opt.value)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                    }`}
+                    onClick={resetFilters}
+                    className="flex items-center gap-1 text-[11px] text-rose-300 hover:text-rose-200 bg-rose-500/10 px-2.5 py-1 rounded-lg border border-rose-500/25 transition-all font-semibold cursor-pointer"
+                    title="Reset all filters"
                   >
-                    {opt.label}
+                    <RotateCcw className="w-3 h-3" />
+                    Reset
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                )}
+              </div>
 
-          {/* Row 3: Language */}
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 block">Language</span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {languageOptions.map((opt) => {
-                const active = filterLanguage === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => setFilterLanguage(opt.value)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Row 4: Geographical Search - Country */}
-          <div className="pt-2 border-t border-[#1f2c27]">
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5 text-[#7ec8a7]" />
-              Country
-            </span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {countryOptions.map((opt) => {
-                const active = filterCountry === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => {
-                      setFilterCountry(opt.value);
-                      setFilterCity("all");
-                    }}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Row 5: Geographical Search - City */}
-          <div>
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-blue-400" />
-              City
-            </span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              <button
-                onClick={() => setFilterCity("all")}
-                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                  filterCity === "all"
-                    ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                    : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                }`}
-              >
-                All cities
-              </button>
-              {availableCities.map((city) => {
-                const active = filterCity === city;
-                return (
-                  <button
-                    key={city}
-                    onClick={() => setFilterCity(city)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
-                    }`}
-                  >
-                    {city}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Row 6: University Rankings & Tuition */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 pt-2 border-t border-[#1f2c27]">
-            <div>
-              <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                University Ranking Tier
-              </span>
-              <div className="flex flex-wrap items-center gap-2">
-                {rankingOptions.map((opt) => {
-                  const active = filterRanking === opt.value;
-                  return (
+              {/* 1. Keyword Search Input */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <Search className="w-3.5 h-3.5 text-slate-400" />
+                  Keyword Search
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search ML, AI, TU Wien, Vision..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-3 pr-8 py-2 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
+                  />
+                  {searchTerm && (
                     <button
-                      key={opt.value}
-                      onClick={() => setFilterRanking(opt.value)}
-                      className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
-                        active
-                          ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                          : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
-                      }`}
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                      title="Clear keyword"
                     >
-                      {opt.label}
+                      <X className="w-3.5 h-3.5" />
                     </button>
-                  );
-                })}
+                  )}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-                <Banknote className="w-3.5 h-3.5 text-emerald-400" />
-                Tuition Tier
-              </span>
-              <div className="flex flex-wrap items-center gap-2">
-                {tuitionOptions.map((opt) => {
-                  const active = filterTuition === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => setFilterTuition(opt.value)}
-                      className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-medium transition-all ${
-                        active
-                          ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                          : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c]"
-                      }`}
-                    >
+              {/* 2. Field Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-[#7ec8a7]" />
+                  Field of Study
+                </label>
+                <select
+                  value={filterField}
+                  onChange={(e) => setFilterField(e.target.value)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  {fieldOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-[#141d1a] text-white">
                       {opt.label}
-                    </button>
-                  );
-                })}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-          </div>
 
-          {/* Row: Application Fee Filter */}
-          <div className="pt-2 border-t border-[#1f2c27]">
-            <span className="text-[#9caaa6] text-sm font-medium mb-2.5 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-cyan-400" />
-              Application Fee
-            </span>
-            <div className="flex flex-wrap items-center gap-2.5">
-              {[
-                { label: "All Application Fees", value: "all" },
-                { label: "Free Application (€0 / No Fee)", value: "free" },
-                { label: "Has Application Fee (uni-assist)", value: "paid" }
-              ].map((opt) => {
-                const active = filterAppFee === opt.value;
-                return (
+              {/* 3. Country Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <Globe className="w-3.5 h-3.5 text-blue-400" />
+                  Country
+                </label>
+                <select
+                  value={filterCountry}
+                  onChange={(e) => {
+                    setFilterCountry(e.target.value);
+                    setFilterCity("all");
+                  }}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  {countryOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-[#141d1a] text-white">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 4. City Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                  City
+                </label>
+                <select
+                  value={filterCity}
+                  onChange={(e) => setFilterCity(e.target.value)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  <option value="all" className="bg-[#141d1a] text-white">All cities</option>
+                  {availableCities.map((city) => (
+                    <option key={city} value={city} className="bg-[#141d1a] text-white">
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 5. Status Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  Application Status
+                </label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  {statusOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-[#141d1a] text-white">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 6. University Ranking Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                  University Ranking Tier
+                </label>
+                <select
+                  value={filterRanking}
+                  onChange={(e) => setFilterRanking(e.target.value)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  {rankingOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-[#141d1a] text-white">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 7. Language Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <Languages className="w-3.5 h-3.5 text-teal-400" />
+                  Language of Instruction
+                </label>
+                <select
+                  value={filterLanguage}
+                  onChange={(e) => setFilterLanguage(e.target.value)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  {languageOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value} className="bg-[#141d1a] text-white">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 8. Application Fee Droplist */}
+              <div>
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
+                  <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                  Application Fee
+                </label>
+                <select
+                  value={filterAppFee}
+                  onChange={(e) => setFilterAppFee(e.target.value as any)}
+                  className="w-full p-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
+                >
+                  <option value="all" className="bg-[#141d1a] text-white">All Application Fees</option>
+                  <option value="free" className="bg-[#141d1a] text-white">Free Application (€0 / No Fee)</option>
+                  <option value="paid" className="bg-[#141d1a] text-white">Has Application Fee (uni-assist)</option>
+                </select>
+              </div>
+
+              {/* 9. Tuition Range Slider */}
+              <div className="pt-3 border-t border-[#1f2c27] space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+                    Max Tuition
+                  </label>
+                  <span className="text-[11px] font-mono text-[#7ec8a7] font-bold">
+                    {maxTuition >= 3000 ? "Any Fee" : `≤ €${maxTuition}/sem`}
+                  </span>
+                </div>
+
+                {/* EU vs Non-EU Toggle in Sidebar */}
+                <div className="grid grid-cols-2 gap-1 bg-[#141d1a] p-1 rounded-xl border border-[#273430]">
                   <button
-                    key={opt.value}
-                    onClick={() => setFilterAppFee(opt.value as any)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
-                      active
-                        ? "bg-[#7ec8a7] text-[#0f1a16] font-semibold shadow-sm"
-                        : "bg-[#18211f] text-[#c2d1cd] border border-[#2d3a36] hover:border-[#40524c] hover:text-white"
+                    onClick={() => setFeeType("nonEu")}
+                    className={`py-1 text-[11px] font-bold rounded-lg transition-all ${
+                      feeType === "nonEu" ? "bg-[#7ec8a7] text-[#0d1613] shadow" : "text-slate-400 hover:text-white"
                     }`}
                   >
-                    {opt.label}
+                    Non-EU
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                  <button
+                    onClick={() => setFeeType("eu")}
+                    className={`py-1 text-[11px] font-bold rounded-lg transition-all ${
+                      feeType === "eu" ? "bg-[#7ec8a7] text-[#0d1613] shadow" : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    EU / EEA
+                  </button>
+                </div>
 
-          {/* Row: Interactive Tuition Fee Range Slider Bar */}
-          <div className="p-4 rounded-2xl bg-[#121b18] border border-[#22312b]">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
-              <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-[#7ec8a7]" />
-                <span className="text-white font-semibold text-sm">Tuition Fee Range Slider</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-[#7ec8a7]/15 border border-[#7ec8a7]/30 text-[#7ec8a7] text-xs font-bold font-mono">
-                  {maxTuition >= 3000 ? "Any Fee (€0 - €5,000+)" : `Max €${maxTuition} / semester`}
-                </span>
+                <input
+                  type="range"
+                  min={0}
+                  max={3000}
+                  step={100}
+                  value={maxTuition}
+                  onChange={(e) => setMaxTuition(parseInt(e.target.value))}
+                  className="w-full h-1.5 bg-[#202f2a] rounded-lg appearance-none cursor-pointer accent-[#7ec8a7]"
+                />
+
+                <div className="grid grid-cols-2 gap-1.5 pt-1">
+                  <button
+                    onClick={() => setMaxTuition(50)}
+                    className={`py-1 px-2 text-[10px] font-medium rounded-lg transition-all text-center ${
+                      maxTuition === 50 ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold" : "bg-[#141d1a] text-slate-400 border border-[#232f2b]"
+                    }`}
+                  >
+                    Free (€0)
+                  </button>
+                  <button
+                    onClick={() => setMaxTuition(750)}
+                    className={`py-1 px-2 text-[10px] font-medium rounded-lg transition-all text-center ${
+                      maxTuition === 750 ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold" : "bg-[#141d1a] text-slate-400 border border-[#232f2b]"
+                    }`}
+                  >
+                    ≤ €750/sem
+                  </button>
+                  <button
+                    onClick={() => setMaxTuition(1500)}
+                    className={`py-1 px-2 text-[10px] font-medium rounded-lg transition-all text-center ${
+                      maxTuition === 1500 ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold" : "bg-[#141d1a] text-slate-400 border border-[#232f2b]"
+                    }`}
+                  >
+                    ≤ €1,500/sem
+                  </button>
+                  <button
+                    onClick={() => setMaxTuition(3000)}
+                    className={`py-1 px-2 text-[10px] font-medium rounded-lg transition-all text-center ${
+                      maxTuition >= 3000 ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold" : "bg-[#141d1a] text-slate-400 border border-[#232f2b]"
+                    }`}
+                  >
+                    Any Fee
+                  </button>
+                </div>
               </div>
-
-              {/* EU vs Non-EU Tuition Toggle */}
-              <div className="flex items-center bg-[#172320] p-1 rounded-xl border border-[#2a3c35]">
-                <button
-                  onClick={() => setFeeType("nonEu")}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    feeType === "nonEu"
-                      ? "bg-[#7ec8a7] text-[#0d1613] shadow font-bold"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  Non-EU / International Fee
-                </button>
-                <button
-                  onClick={() => setFeeType("eu")}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
-                    feeType === "eu"
-                      ? "bg-[#7ec8a7] text-[#0d1613] shadow font-bold"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  EU / EEA Fee
-                </button>
-              </div>
             </div>
+          </aside>
 
-            {/* Slider bar */}
-            <div className="flex items-center gap-4">
-              <span className="text-xs text-slate-400 font-mono">€0</span>
-              <input
-                type="range"
-                min={0}
-                max={3000}
-                step={100}
-                value={maxTuition}
-                onChange={(e) => setMaxTuition(parseInt(e.target.value))}
-                className="w-full h-2 bg-[#202f2a] rounded-lg appearance-none cursor-pointer accent-[#7ec8a7]"
-              />
-              <span className="text-xs text-slate-400 font-mono">€3,000+</span>
-            </div>
-
-            {/* Quick Range Presets */}
-            <div className="flex flex-wrap items-center gap-2 mt-3 pt-2.5 border-t border-[#1d2a25]">
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider font-semibold mr-1">Quick Presets:</span>
-              {[
-                { label: "Free (€0 / ÖH Only)", val: 50 },
-                { label: "Standard Public (≤ €750/sem)", val: 750 },
-                { label: "Moderate (≤ €1,500/sem)", val: 1500 },
-                { label: "Any Fee", val: 3000 }
-              ].map((preset) => (
-                <button
-                  key={preset.val}
-                  onClick={() => setMaxTuition(preset.val)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                    maxTuition === preset.val
-                      ? "bg-[#7ec8a7]/25 text-[#7ec8a7] border border-[#7ec8a7]/50 font-bold"
-                      : "bg-[#182420] text-slate-300 border border-[#273832] hover:border-slate-500"
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Row 7: Keyword Search & Sort Controls */}
-          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 pt-3 border-t border-[#1f2c27]">
-            {/* Keyword Search Input */}
-            <div className="relative flex-1 max-w-lg">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search by keywords (e.g. ML, DL, Deep Learning, AI, Cyber, Vision, TU Wien)..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 bg-[#141d1a] border border-[#273430] rounded-xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7]"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-
-            {/* Sort Selector & Reset */}
-            <div className="flex items-center gap-2 self-start md:self-auto flex-wrap">
-              <ArrowUpDown className="w-4 h-4 text-slate-400 shrink-0" />
-              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sort:</span>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-[#141d1a] border border-[#273430] text-slate-200 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#7ec8a7] cursor-pointer"
-              >
-                <option value="rank_world">🌐 QS World Rank (Best first)</option>
-                <option value="rank_country">🏆 Country Rank (#1 in Austria)</option>
-                <option value="deadline">⏰ Deadline (Closing soonest)</option>
-                <option value="tuition">💰 Tuition (Free / Lowest first)</option>
-                <option value="name">🔤 Program Name (A - Z)</option>
-              </select>
-
-              {hasActiveFilters && (
-                <button
-                  onClick={resetFilters}
-                  className="flex items-center gap-1.5 text-xs text-rose-300 hover:text-rose-200 bg-rose-500/10 border border-rose-500/30 px-3 py-2 rounded-xl transition-all font-semibold"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  Reset Filters
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+          {/* RIGHT COLUMN: Results Header + Program Cards Grid */}
+          <main className="lg:col-span-8 xl:col-span-8.5 space-y-6">
 
         {/* Screenshot 2 Exact Meta Bar */}
         <div className="flex flex-wrap items-center justify-between text-xs sm:text-sm text-slate-400 mb-8 px-2 py-1">
@@ -1600,13 +1539,15 @@ export default function ProgramList({
             </p>
             <button
               onClick={resetFilters}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7ec8a7] text-[#0f1a16] text-xs font-bold hover:bg-teal-400 transition-all shadow-md"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#7ec8a7] text-[#0f1a16] text-xs font-bold hover:bg-teal-400 transition-all shadow-md cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Reset All Filters
             </button>
           </div>
         )}
+          </main>
+        </div>
       </div>
     </div>
   );
