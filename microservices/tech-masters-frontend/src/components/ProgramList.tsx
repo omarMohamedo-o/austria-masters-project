@@ -650,31 +650,13 @@ export default function ProgramList({
     }
 
     // 2. TU Wien
-    // Non-EU Winter closed 3 Aug 2026. Summer opens Jan 2027.
+    // Non-EU Winter closed 3 Aug 2026. Summer opens ~5 Jan 2027.
     // EU general admission period open until 31 Oct 2026.
     if (inst.includes("tu wien")) {
       if (isNonEu) {
         return {
           status: "closed" as const,
-          label: "Winter Closed for Non-EU · Summer Opens Jan",
-          badgeColor: "rose" as const,
-          isClosedForUser: true
-        };
-      }
-      return {
-        status: "open" as const,
-        label: "Open Now (EU General Window)",
-        badgeColor: "emerald" as const,
-        isClosedForUser: false
-      };
-    }
-
-    // 3. University of Innsbruck (Quantum)
-    if (inst.includes("innsbruck")) {
-      if (isNonEu) {
-        return {
-          status: "closed" as const,
-          label: "Winter Closed for Non-EU (Was 5 Sep)",
+          label: "Winter Closed (3 Aug) · Summer Opens Jan",
           badgeColor: "rose" as const,
           isClosedForUser: true
         };
@@ -687,12 +669,14 @@ export default function ProgramList({
       };
     }
 
-    // 4. University of Klagenfurt (Cloud Computing & Distributed Systems)
-    if (inst.includes("klagenfurt") && p.status === "open") {
+    // 3. JKU Linz
+    // Non-EU Winter closed 5 Sep 2026 (15 Jul regular). Summer 2027 opens 16 Nov 2026.
+    // EU online pre-registration active until 31 Oct 2026.
+    if (inst.includes("jku") || (inst.includes("linz") && !inst.includes("fh") && !inst.includes("upper"))) {
       if (isNonEu) {
         return {
           status: "closed" as const,
-          label: "Winter Closed for Non-EU (Was 5 Sep)",
+          label: "Winter Closed (5 Sep) · Summer Opens 16 Nov",
           badgeColor: "rose" as const,
           isClosedForUser: true
         };
@@ -705,12 +689,23 @@ export default function ProgramList({
       };
     }
 
-    // 5. Paris Lodron University of Salzburg (HCI)
-    if (inst.includes("salzburg") && inst.includes("paris lodron") && p.status === "open") {
+    // 4. TU Graz & NAWI Graz
+    // Winter 2026/27 closed; Summer 2027 intake window opens 15 Oct 2026.
+    if (inst.includes("tu graz") || (inst.includes("graz") && !inst.includes("fh"))) {
+      return {
+        status: "soon" as const,
+        label: "Winter Closed · Summer Opens 15 Oct",
+        badgeColor: "amber" as const,
+        isClosedForUser: true
+      };
+    }
+
+    // 5. University of Innsbruck (Quantum)
+    if (inst.includes("innsbruck") && !inst.includes("mci")) {
       if (isNonEu) {
         return {
           status: "closed" as const,
-          label: "Winter Closed for Non-EU (Was 1 Sep)",
+          label: "Winter Closed (5 Sep) · Summer Opens Jan",
           badgeColor: "rose" as const,
           isClosedForUser: true
         };
@@ -720,6 +715,73 @@ export default function ProgramList({
         label: "Open Now (EU to 31 Oct)",
         badgeColor: "emerald" as const,
         isClosedForUser: false
+      };
+    }
+
+    // 6. University of Klagenfurt (AAU)
+    if (inst.includes("klagenfurt") && !inst.includes("fh") && !inst.includes("cuas")) {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed (5 Sep) · Summer Opens Jan",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU to 31 Oct)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    // 7. Paris Lodron University of Salzburg
+    if (inst.includes("salzburg") && !inst.includes("fh")) {
+      if (isNonEu) {
+        return {
+          status: "closed" as const,
+          label: "Winter Closed (1 Sep) · Summer Opens 16 Nov",
+          badgeColor: "rose" as const,
+          isClosedForUser: true
+        };
+      }
+      return {
+        status: "open" as const,
+        label: "Open Now (EU to 31 Oct)",
+        badgeColor: "emerald" as const,
+        isClosedForUser: false
+      };
+    }
+
+    // 8. German Universities (TUM)
+    if (inst.includes("munich") || inst.includes("tum")) {
+      return {
+        status: "soon" as const,
+        label: "Winter Closed · Summer Opens 1 Jan",
+        badgeColor: "amber" as const,
+        isClosedForUser: true
+      };
+    }
+
+    // 9. Austrian FHs (Applied Sciences - Hagenberg, Technikum Wien, Joanneum, Salzburg, etc.)
+    if (
+      inst.includes("fh ") ||
+      inst.includes("uas ") ||
+      inst.includes("hagenberg") ||
+      inst.includes("technikum") ||
+      inst.includes("joanneum") ||
+      inst.includes("pölten") ||
+      inst.includes("burgenland") ||
+      inst.includes("carinthia") ||
+      inst.includes("cuas") ||
+      inst.includes("campus wien")
+    ) {
+      return {
+        status: "closed" as const,
+        label: "Winter 2026 Closed · 2027/28 Opens Nov",
+        badgeColor: "rose" as const,
+        isClosedForUser: true
       };
     }
 
