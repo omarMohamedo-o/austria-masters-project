@@ -187,17 +187,6 @@ export default function GoogleAdUnit({
           </a>
         </div>
       </div>
-
-      {/* Official AdChoices Disclaimer Bar */}
-      <div className="px-4 py-1.5 bg-[#0a0f0d]/80 border-t border-[#1f2c27] flex items-center justify-between text-[10px] text-slate-500 font-mono">
-        <span className="flex items-center gap-1">
-          <Info className="w-3 h-3 text-slate-400" />
-          Google Ads & Verified Student Partners · Live Monetization Active
-        </span>
-        <span className="text-emerald-400 font-bold font-sans">
-          CPC ${activeAd.cpc.toFixed(2)} Verified
-        </span>
-      </div>
     </div>
   );
 }

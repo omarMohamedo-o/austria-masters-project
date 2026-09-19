@@ -1772,17 +1772,6 @@ export default function ProgramList({
               </a>
             </div>
 
-            {/* Real-time View Duration & CPM Monetization Status */}
-            <div className="flex items-center justify-between text-[11px] text-slate-400 bg-[#121c19] border border-[#232f2b] rounded-xl px-3 py-1.5">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                Active View Monetized ({5 - countdown}s / 5s)
-              </span>
-              <span className="text-amber-300/90 font-mono font-bold text-[10px]">
-                ⚡ CPM + View Duration Tracked
-              </span>
-            </div>
-
             {/* Countdown & Auto-Redirect Section */}
             <div className="space-y-2.5 pt-1">
               <div className="flex items-center justify-between text-xs">
