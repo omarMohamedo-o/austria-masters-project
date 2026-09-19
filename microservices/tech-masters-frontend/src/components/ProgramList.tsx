@@ -468,9 +468,14 @@ export default function ProgramList({
     setCountdown(5);
     setIsAutoRedirectActive(true);
 
-    // Track ad impression & credit monetization earning
+    // Track ad impression (CPM) & credit initial click monetization earning
     if (chosenAd) {
       handleAdClick(chosenAd.id);
+      fetch("/api/ads/impression", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adId: chosenAd.id })
+      }).catch(() => {});
     }
   };
 
@@ -490,7 +495,7 @@ export default function ProgramList({
     window.location.href = url;
   };
 
-  // Auto-redirect countdown effect
+  // Auto-redirect countdown effect with active view seconds tracking
   useEffect(() => {
     if (!gatewayModal || !isAutoRedirectActive) return;
 
@@ -500,11 +505,24 @@ export default function ProgramList({
     }
 
     const timer = setTimeout(() => {
+      // Send live 1-second view duration heartbeat to monetize view time
+      if (modalAd) {
+        fetch("/api/ads/view-duration", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ adId: modalAd.id, seconds: 1 })
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d?.totalRevenue) setAdRevenue(d.totalRevenue);
+          })
+          .catch(() => {});
+      }
       setCountdown((prev) => prev - 1);
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [gatewayModal, isAutoRedirectActive, countdown]);
+  }, [gatewayModal, isAutoRedirectActive, countdown, modalAd]);
 
   // Complete cities directory for Austria & Germany
   const citiesByCountry: Record<string, string[]> = {
@@ -1744,6 +1762,17 @@ export default function ProgramList({
               >
                 {modalAd.cta} <ExternalLink className="w-4 h-4" />
               </a>
+            </div>
+
+            {/* Real-time View Duration & CPM Monetization Status */}
+            <div className="flex items-center justify-between text-[11px] text-slate-400 bg-[#121c19] border border-[#232f2b] rounded-xl px-3 py-1.5">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Active View Monetized ({5 - countdown}s / 5s)
+              </span>
+              <span className="text-amber-300/90 font-mono font-bold text-[10px]">
+                ⚡ CPM + View Duration Tracked
+              </span>
             </div>
 
             {/* Countdown & Auto-Redirect Section */}

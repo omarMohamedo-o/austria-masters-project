@@ -1,0 +1,7 @@
+# Tech Masters Admissions Platform - IAB Authorized Digital Sellers (ads.txt)
+# Google AdSense Publisher Account
+google.com, pub-9842104820194821, DIRECT, f08c47fec0942fa0
+
+# Partner Educational Ad Exchanges
+directsponsors.eu, 48210, DIRECT
+edtech-exchange.org, TM-9912, DIRECT

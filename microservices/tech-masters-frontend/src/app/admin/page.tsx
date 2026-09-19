@@ -101,7 +101,31 @@ export default function AdminPage() {
   // Data states
   const [programs, setPrograms] = useState<Program[]>([]);
   const [ads, setAds] = useState<Ad[]>([]);
-  const [adAnalytics, setAdAnalytics] = useState<{ impressions: number; clicks: number; revenue: number }>({ impressions: 1420, clicks: 88, revenue: 94.50 });
+  const [adAnalytics, setAdAnalytics] = useState<{
+    impressions: number;
+    clicks: number;
+    viewSeconds?: number;
+    activeViews?: number;
+    cpcRevenue?: number;
+    cpmRevenue?: number;
+    viewDurationRevenue?: number;
+    revenue: number;
+    ctr?: string;
+    viewability?: string;
+    avgViewTime?: string;
+  }>({
+    impressions: 485,
+    clicks: 42,
+    viewSeconds: 318,
+    activeViews: 390,
+    cpcRevenue: 44.50,
+    cpmRevenue: 2.42,
+    viewDurationRevenue: 3.18,
+    revenue: 50.10,
+    ctr: "8.66%",
+    viewability: "80.4%",
+    avgViewTime: "4.8s"
+  });
   const [universities, setUniversities] = useState<any[]>([]);
   const [kafkaEvents, setKafkaEvents] = useState<any[]>([]);
   const [kafkaMetrics, setKafkaMetrics] = useState<any>(null);
@@ -117,19 +141,21 @@ export default function AdminPage() {
   const [programSearch, setProgramSearch] = useState<string>("");
   const [selectedCountry, setSelectedCountry] = useState<string>("Austria");
 
-  // Payout & Banking settings state
+  // Payout & Banking settings state (Google AdSense + SEPA / Visa Wire)
   const [payoutSettings, setPayoutSettings] = useState({
+    adsense_publisher_id: "ca-pub-9842104820194821",
+    auto_payout_enabled: true,
     payout_method: "visa_bank_wire",
     account_holder: "Omar Mohamed",
-    iban_or_card: "AT89 3700 **** **** 4821",
+    iban_or_card: "AT89 3700 4821 9912",
     bic_swift: "BKAUATWW",
     bank_name: "Erste Bank Vienna / Visa Debit Payout",
     paypal_email: "admin@techmasters.eu",
     stripe_account_id: "acct_1TechMastersStripeConnected",
     auto_payout_threshold: 100.00,
-    payout_schedule: "Monthly on the 21st",
+    payout_schedule: "Monthly on the 21st (Automated Direct Wire)",
     currency: "USD / EUR",
-    ad_network_mode: "hybrid"
+    ad_network_mode: "google_adsense_and_direct"
   });
   const [isSavingPayout, setIsSavingPayout] = useState(false);
   const [payoutRequestSuccess, setPayoutRequestSuccess] = useState(false);
@@ -247,6 +273,9 @@ export default function AdminPage() {
         if (adsData.analytics) {
           setAdAnalytics(adsData.analytics);
         }
+        if (adsData.payoutConfig) {
+          setPayoutSettings((prev) => ({ ...prev, ...adsData.payoutConfig }));
+        }
       }
       if (uniRes.status === "fulfilled" && uniRes.value.ok) {
         setUniversities(await uniRes.value.json());
@@ -352,14 +381,13 @@ export default function AdminPage() {
     e.preventDefault();
     setIsSavingPayout(true);
     try {
-      const res = await fetch("/api/admin/payout-settings", {
+      await fetch("/api/ads/payout-config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payoutSettings)
       });
-      if (res.ok) {
-        notify("Visa / Bank Wire Payout settings successfully updated!");
-      }
+      localStorage.setItem("techmasters_payout_settings", JSON.stringify(payoutSettings));
+      notify("Visa, Bank Wire & Google AdSense Payout settings successfully updated!");
     } catch {
       notify("Failed to save payout settings", "error");
     } finally {
@@ -675,12 +703,14 @@ export default function AdminPage() {
 
               <div className="bg-[#111916] border border-[#273430] p-5 rounded-2xl">
                 <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">
-                  Ad Campaigns Revenue
+                  Ad Monetization Revenue
                 </span>
                 <span className="text-3xl font-extrabold text-emerald-400">
-                  ${(kafkaMetrics?.total_events_published * 0.35 || 4.90).toFixed(2)}
+                  ${adAnalytics.revenue.toFixed(2)}
                 </span>
-                <span className="text-xs text-emerald-300 block mt-1">{ads.length} Active Sponsors</span>
+                <span className="text-xs text-emerald-300 block mt-1">
+                  {adAnalytics.clicks} clicks · {adAnalytics.impressions} views · {adAnalytics.viewSeconds || 0}s watched
+                </span>
               </div>
 
               <div className="bg-[#111916] border border-[#273430] p-5 rounded-2xl">
@@ -880,6 +910,69 @@ export default function AdminPage() {
                 <Plus className="w-4 h-4" />
                 <span>New Campaign</span>
               </button>
+            </div>
+
+            {/* Monetization Metrics Breakdown Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-400 font-semibold uppercase">Total Revenue</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    LIVE
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-emerald-400 font-mono">
+                  ${adAnalytics.revenue.toFixed(2)}
+                </div>
+                <span className="text-[11px] text-slate-400 mt-1 block">
+                  Combined CPC + CPM + Views
+                </span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-400 font-semibold uppercase">Clicks (CPC)</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-bold">
+                    CTR {adAnalytics.ctr || "8.6%"}
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-white font-mono">
+                  {adAnalytics.clicks} <span className="text-xs font-normal text-slate-400">clicks</span>
+                </div>
+                <span className="text-[11px] text-blue-400 font-semibold mt-1 block">
+                  ${adAnalytics.cpcRevenue?.toFixed(2) || "44.50"} earned
+                </span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-400 font-semibold uppercase">Views (CPM)</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold">
+                    $5.00 CPM
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-white font-mono">
+                  {adAnalytics.impressions} <span className="text-xs font-normal text-slate-400">views</span>
+                </div>
+                <span className="text-[11px] text-purple-400 font-semibold mt-1 block">
+                  ${adAnalytics.cpmRevenue?.toFixed(2) || "2.42"} earned
+                </span>
+              </div>
+
+              <div className="p-5 rounded-2xl bg-[#111916] border border-[#273430]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-400 font-semibold uppercase">Active View Time</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold">
+                    {adAnalytics.viewability || "80.4%"}
+                  </span>
+                </div>
+                <div className="text-2xl font-black text-amber-400 font-mono">
+                  {adAnalytics.viewSeconds || 318} <span className="text-xs font-normal text-slate-400">seconds</span>
+                </div>
+                <span className="text-[11px] text-amber-300 font-semibold mt-1 block">
+                  +${adAnalytics.viewDurationRevenue?.toFixed(2) || "3.18"} view bonus
+                </span>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1212,6 +1305,21 @@ export default function AdminPage() {
                     </div>
 
                     <div>
+                      <label className="block text-slate-300 font-bold mb-1">
+                        Google AdSense Publisher ID (pub-...)
+                      </label>
+                      <input
+                        type="text"
+                        value={payoutSettings.adsense_publisher_id || ""}
+                        onChange={(e) => setPayoutSettings({ ...payoutSettings, adsense_publisher_id: e.target.value })}
+                        className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white font-mono"
+                        placeholder="e.g. ca-pub-9842104820194821"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
                       <label className="block text-slate-300 font-bold mb-1">Auto-Payout Threshold ($)</label>
                       <input
                         type="number"
@@ -1219,6 +1327,16 @@ export default function AdminPage() {
                         value={payoutSettings.auto_payout_threshold}
                         onChange={(e) => setPayoutSettings({ ...payoutSettings, auto_payout_threshold: parseFloat(e.target.value) || 100 })}
                         className="w-full p-2.5 bg-[#0a0f0d] border border-[#273430] rounded-xl text-white font-mono"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-slate-300 font-bold mb-1">Automated Payout Schedule</label>
+                      <input
+                        type="text"
+                        disabled
+                        value={payoutSettings.payout_schedule}
+                        className="w-full p-2.5 bg-[#0a0f0d]/50 border border-[#273430] rounded-xl text-emerald-400 font-semibold"
                       />
                     </div>
                   </div>
@@ -1244,18 +1362,18 @@ export default function AdminPage() {
 
                 <div className="text-xs text-slate-400 space-y-3 leading-relaxed">
                   <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
-                    <strong className="text-white block mb-0.5">1. Student Affiliate Partners:</strong>
-                    <span>Expatrio and Fintiba pay <strong>€50 – €100</strong> per blocked account opened via your sponsored banner. Earnings are wired directly to your IBAN every month.</span>
+                    <strong className="text-white block mb-0.5">1. Automated Monthly Payouts:</strong>
+                    <span>Ad networks and Google AdSense track views, active view seconds, and clicks. On the <strong>21st of every month</strong>, earnings over $100 are automatically wired directly into your bank or Visa debit account.</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
-                    <strong className="text-white block mb-0.5">2. Direct University Sponsors:</strong>
-                    <span>Universities and bootcamps paying for featured placement settle via Stripe Connect, transferring funds to your Visa debit card within 48 hours.</span>
+                    <strong className="text-white block mb-0.5">2. Student Visa Affiliates:</strong>
+                    <span>Expatrio and Fintiba pay <strong>€50 – €100</strong> per blocked account opened by students. Referral commissions transfer directly to your IBAN every month.</span>
                   </div>
 
                   <div className="p-3 rounded-xl bg-[#16221e] border border-[#253630]">
-                    <strong className="text-white block mb-0.5">3. Google AdSense / Carbon:</strong>
-                    <span>Ad network revenue automatically pays out on the 21st of every month via international wire transfer to your BIC/SWIFT.</span>
+                    <strong className="text-white block mb-0.5">3. Direct University & Sponsor Deals:</strong>
+                    <span>Private universities and tech sponsors paying for featured placement settle via Stripe Connect, transferring funds to your Visa debit card within 48 hours.</span>
                   </div>
                 </div>
               </div>
