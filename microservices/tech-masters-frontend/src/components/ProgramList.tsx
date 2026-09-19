@@ -880,9 +880,9 @@ export default function ProgramList({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* LEFT SIDEBAR: Search Settings (Droplists on the left) - Scrollable alone */}
           <aside className="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-20 z-20">
-            <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4 max-h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain custom-scrollbar pr-3">
-              {/* Sidebar Header (Sticky inside sidebar) */}
-              <div className="sticky top-0 bg-[#0e1413]/95 backdrop-blur-md z-10 -mt-2 pt-2 pb-3 border-b border-[#1f2c27] flex items-center justify-between">
+            <div className="bg-[#0e1413] border border-[#232f2b] rounded-3xl shadow-2xl flex flex-col max-h-[calc(100vh-6rem)] overflow-hidden">
+              {/* Sidebar Header (Fixed at top, strictly outside the scroll container) */}
+              <div className="p-4 sm:p-5 pb-3.5 border-b border-[#1f2c27] bg-[#0e1413] flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-[#7ec8a7]" />
                   <h2 className="text-white font-extrabold text-sm uppercase tracking-wider">
@@ -907,7 +907,9 @@ export default function ProgramList({
                 )}
               </div>
 
-              {/* 1. Keyword Search Input */}
+              {/* Scrollable Filters Body (Scrolls strictly underneath the fixed header divider) */}
+              <div className="p-4 sm:p-5 pt-3.5 space-y-4 overflow-y-auto overscroll-contain custom-scrollbar flex-1">
+                {/* 1. Keyword Search Input */}
               <div>
                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5 mb-1.5">
                   <Search className="w-3.5 h-3.5 text-slate-400" />
@@ -1144,6 +1146,8 @@ export default function ProgramList({
                     Any Fee
                   </button>
                 </div>
+              </div>
+              {/* End of Scrollable Filters Body */}
               </div>
             </div>
           </aside>
