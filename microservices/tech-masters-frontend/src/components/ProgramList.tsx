@@ -32,6 +32,7 @@ import {
   Calculator,
   Sliders
 } from "lucide-react";
+import GoogleAdUnit from "./GoogleAdUnit";
 
 export type Program = {
   id?: string;
@@ -1195,6 +1196,13 @@ export default function ProgramList({
             </span>
           )}
         </div>
+
+        {/* Real Live Commercial Educational Sponsor Leaderboard */}
+        <GoogleAdUnit
+          className="mb-8"
+          fallbackAdId="ad_expatrio_blocked_account"
+          onAdClick={handleAdClick}
+        />
 
         {/* TAB 1: PROGRAMS GRID WITH IN-FEED SPONSORED CARDS */}
         {activeTab === "programs" && (
